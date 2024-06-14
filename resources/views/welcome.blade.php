@@ -422,6 +422,22 @@
     </div>
   </div>
   <footer id="contato" class="text-center py-5 mt-5 w-100">
+  <div class="modal fade" id="modal-1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5 fw-bold" id="exampleModalLabel">MR TELLES</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><a href="https://wa.me/5543988355501">https://whats.link/mrtelles</a></p>
+        </div>
+        <div class="modal-footer mx-auto">
+          <button type="button" class="btn btn-secondary botao-padrao border-0" data-bs-dismiss="modal">Fechar janela</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <section class="container p-5">
   <a href="#!" class="btn" data-bs-toggle="modal" data-bs-target="#modal-1"><i class="bi bi-whatsapp whatsapp-icon"></i></a>
   </section>

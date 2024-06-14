@@ -38,7 +38,10 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="./fullcalendar/locale/pt-br.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="{{ asset('pt-br.global.min.js') }}"></script>
+     
+    
         
     
 
@@ -53,6 +56,7 @@
         var calendarEl = document.getElementById('calendar');
         var events = [];
         var calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'pt-br',
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -62,7 +66,6 @@
                 
             },
             initialView: 'dayGridMonth',
-            locale: 'pt-br',
             timeZone: 'UTC',
             events: '/events',
             editable: true,
