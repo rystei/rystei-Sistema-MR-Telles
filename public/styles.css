@@ -65,3 +65,19 @@ input[type="checkbox"]:focus {
 .botao-padrao:hover {
     background-color: var(--marrom-escuro);
 }
+
+footer {
+    background-color: var(--marrom-escuro);
+}
+
+#contato .container {
+  padding: 5rem !important; /* Aumenta o padding da seção container */
+}
+
+#contato .p-5 {
+  padding: 5rem !important; /* Aumenta o padding interno do div */
+}
+
+.whatsapp-icon {
+    font-size: 3em; /* ou qualquer tamanho desejado */
+  }

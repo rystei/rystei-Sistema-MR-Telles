@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="../img/Logo_Final.png" type="image/x-icon">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-  <title>MR Telles</title>
+  <title>MR TELLES</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -22,7 +22,7 @@
   <header>
     <nav class="navbar-expand-lg navbar bg-body-tertiary fixed-top">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#"><img src="../img/Logo_Final.png" alt="Logo do escritório MR Telles"></a>
+        <a class="navbar-brand" href="#"><img src="../img/Logo_Final.png" alt="Logo do escritório MR TELLES"></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
           aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -30,25 +30,26 @@
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
           <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="offcanvasNavbarLabel"><img src="./img/Logo_Final.png"
-                alt="Logo do escritório MR Telles"></h5>
+                alt="Logo do escritório MR TELLES"></h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div class="offcanvas-body">
             <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Início</a>
+                <a class="nav-link " aria-current="page" href="#">Início</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Sobre</a>
+                <a class="nav-link" href="#servicos">Sobre</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Contato</a>
+                <a class="nav-link" href="#contato">Contato</a>
+              </li>
+              <li class="nav-item">
+              <a class="nav-link" href="{{ route('agendar_compromissos') }}">Compromissos</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">
                   <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                    <label class="form-check-label" for="flexSwitchCheckDefault">Modo noturno</label>
                   </div>
                 </a>
               </li>
@@ -60,12 +61,12 @@
   <main>
     <section class="banners banner-1 d-flex flex-column justify-content-center text-center">
       <div class="banners-titulo bg-body-secondary py-5">
-        <h2 class="fw-bold">Bem vindo a MR Telles Sociedade Individual de Advocacia.</h2>
-        <p>Na MR Telles, sua busca por soluções legais termina aqui. Encontre-a conosco!</p>
+        <h2 class="fw-bold">Bem vindo a MR TELLES Sociedade Individual de Advocacia.</h2>
+        <p>Na MR TELLES, sua busca por soluções legais termina aqui. Encontre-a conosco!</p>
       </div>
     </section>
     <section class="py-5">
-      <h2 class="text-center fw-bold pb-1">Nossos serviços</h2>
+      <h2 id="servicos" class="text-center fw-bold pb-1">Nossos serviços</h2>
 
       <div class="container d-flex justify-content-around flex-wrap">
 
@@ -152,7 +153,7 @@
             <div class="accordion-body">
               Quando você ou sua empresa precisam resolver um problema relacionado a contratos, propriedade,
               danos ou qualquer outra questão que não envolva crimes, é aí que entra a área civil da advocacia.
-              <strong> A MR Telles está aqui para ajudá-lo </strong> a entender seus direitos, resolver conflitos
+              <strong> A MR TELLES está aqui para ajudá-lo </strong> a entender seus direitos, resolver conflitos
               de forma justa e alcançar as melhores soluções possíveis para seus problemas legais.
             </div>
           </div>
@@ -420,6 +421,15 @@
       </div>
     </div>
   </div>
+  <footer id="contato" class="text-center py-5 mt-5 w-100">
+  <section class="container p-5">
+  <a href="#!" class="btn" data-bs-toggle="modal" data-bs-target="#modal-1"><i class="bi bi-whatsapp whatsapp-icon"></i></a>
+  </section>
+  <div class="p-5">
+    2024 <i class="bi bi-c-circle"></i> Desenvolvido por MR Telles Sociedade Individual de Advocacia.
+  </div>
+</footer>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
   </script>

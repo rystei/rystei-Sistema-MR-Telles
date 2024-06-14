@@ -10,6 +10,7 @@ Route::get('/', function () {
 });
 
 Route::get('/AgendarCompromissos',[ScheduleController::class, 'index']);
+Route::get('/AgendarCompromissos', [ScheduleController::class, 'index'])->name('agendar_compromissos');
 Route::get('/events', [ScheduleController::class, 'getEvents']);
 
 Route::delete('/schedule/{id}',[ScheduleController::class, 'deleteEvent']);
@@ -24,3 +25,4 @@ Route::view('add-schedule', 'schedule.add');
 Route::post('create-schedule', [ScheduleController::class, 'create']);
 
 Route::get('/adicionar',[ScheduleController::class, 'add']);
+
