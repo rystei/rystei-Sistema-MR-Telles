@@ -430,7 +430,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p><a href="https://wa.me/5543988355501">https://whats.link/mrtelles</a></p>
+          <p><a href="https://wa.me/5543988355501">MR TELLES</a></p>
         </div>
         <div class="modal-footer mx-auto">
           <button type="button" class="btn btn-secondary botao-padrao border-0" data-bs-dismiss="modal">Fechar janela</button>
