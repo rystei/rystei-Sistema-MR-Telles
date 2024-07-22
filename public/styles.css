@@ -1,6 +1,15 @@
-.container-fluid , header{
+/* Adiciona um wrapper ao redor do conteúdo da página */
+.wrapper {
+    padding-top: 60px; /* altura da navbar */
+  }
+  
+  .container-fluid, header {
     background-color: #816D4F;
-}
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+  }
 
 .navbar-brand img {
     width: 80px; 
@@ -72,6 +81,7 @@ footer {
 
 #contato .container {
   padding: 5rem !important; /* Aumenta o padding da seção container */
+  
 }
 
 #contato .p-5 {

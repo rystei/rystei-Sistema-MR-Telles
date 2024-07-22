@@ -13,7 +13,6 @@
 </head>
 <body>
     <div class="container mt-5">
-        {{-- For Search --}}
         <div class="row">
             <div class="col-md-6">
                 <div class="input-group mb-3">
@@ -23,7 +22,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-md-6">
                 <div class="btn-group mb-3" role="group" aria-label="Calendar Actions">
                     <button id="exportButton" class="btn btn-success">{{ __('Exportar Calendário') }}</button>
@@ -33,7 +31,6 @@
                 </div>
             </div>
         </div>
-
         <div class="card">
             <div class="card-body">
                 <div id="calendar" style="width: 100%; height: 100vh;"></div>
@@ -58,10 +55,8 @@
             },
             initialView: 'dayGridMonth',
             timeZone: 'UTC',
-            events: '/events',
             editable: true,
 
-            // Deletar o evento
             eventContent: function(info) {
                 var eventTitle = info.event.title;
                 var eventElement = document.createElement('div');
@@ -78,7 +73,7 @@
                             },
                             success: function(response) {
                                 console.log('Evento deletado com sucesso.');
-                                calendar.refetchEvents(); // Atualiza o calendário após deletar um evento
+                                calendar.refetchEvents();
                             },
                             error: function(error) {
                                 console.error('Erro ao deletar o evento', error);
@@ -90,8 +85,7 @@
                     domNodes: [eventElement]
                 };
             },
-
-            // Arrastar e soltar
+            
             eventDrop: function(info) {
                 var eventId = info.event.id;
                 var newStartDate = info.event.start;
@@ -116,7 +110,6 @@
                 });
             },
 
-            // Evento redimensionado
             eventResize: function(info) {
                 var eventId = info.event.id;
                 var newEndDate = info.event.end;
@@ -139,6 +132,19 @@
                     }
                 });
             },
+
+            events: function(fetchInfo, successCallback, failureCallback) {
+                $.ajax({
+                    url: '/events',
+                    method: 'GET',
+                    success: function(response) {
+                        successCallback(response);
+                    },
+                    error: function(error) {
+                        failureCallback(error);
+                    }
+                });
+            }
         });
 
         calendar.render();
@@ -149,37 +155,38 @@
         });
 
         function filterAndDisplayEvents(searchKeywords) {
-            console.log('Procurando por: ' + searchKeywords);
-            $.ajax({
-                method: 'GET',
-                url: `/events/search?title=${searchKeywords}`,
+            console.log(`Procurando por: ${searchKeywords}`);
+                 $.ajax({
+                 method: 'GET',
+                 url: `/events/search?title=${searchKeywords}`,
                 success: function(response) {
-                    console.log('Resposta da busca:', response);
+                  console.log('Resposta da busca:', response);
 
-                    // Limpar todos os eventos atuais do calendário
-                    calendar.removeAllEvents();
+        // Ir para a data do primeiro evento encontrado
+        calendar.gotoDate(new Date(response[0].start));
 
-                    if (response.length > 0) {
-                        // Navegar para a data do primeiro evento encontrado
-                        var firstEventDate = new Date(response[0].start);
-                        console.log('Navegando para a data do primeiro evento encontrado:', firstEventDate);
-                        calendar.gotoDate(firstEventDate);
+      // Limpar todos os eventos atuais do calendário
+      calendar.removeAllEvents();
 
-                        // Esperar um tempo para garantir que a navegação foi concluída
-                        setTimeout(function() {
-                            // Adicionar apenas os eventos encontrados
-                        }, 500);
-                    } else {
-                        console.log('Nenhum evento encontrado.');
-                    }
-                },
-                error: function(error) {
-                    console.error('Erro ao procurar eventos:', error);
-                }
-            });
-        }
+      // Se não houver resposta, não há eventos para adicionar
+      if (response.length === 0) {
+        console.log('Nenhum evento encontrado.');
+        return;
+      }
 
-        // Função exportação
+      // Adicionar apenas os eventos correspondentes à busca
+      $.each(response, function(index, searchedEvent) {
+        console.log(`Adicionando evento: ${searchedEvent}`);
+        calendar.addEvent(searchedEvent);
+      });
+
+    },
+    error: function(xhr, status, error) {
+      console.error(`Erro ao procurar eventos: ${error} (${status})`);
+    }
+  });
+}  
+
         document.getElementById('exportButton').addEventListener('click', function() {
             var events = calendar.getEvents().map(function(event) {
                 return {
