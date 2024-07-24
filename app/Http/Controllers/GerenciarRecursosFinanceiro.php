@@ -12,24 +12,25 @@ class GerenciarRecursosFinanceiro extends Controller
     {
         // Validação dos dados recebidos
         $request->validate([
-            'amount' => 'required|numeric|min:0',
-            'discount_percentage' => 'required|numeric|min:0|max:100',
+            'total_amount' => 'required|numeric|min:0',
+            'percentage' => 'required|numeric|min:0|max:100',
             'installments' => 'required|integer|min:1'
         ]);
 
         try {
             // Captura dos dados da requisição
-            $amount = $request->input('amount');
-            $discountPercentage = $request->input('discount_percentage');
+            $totalAmount = $request->input('total_amount');
+            $percentage = $request->input('percentage');
             $installments = $request->input('installments');
 
-            // Cálculo dos valores
-            $discountAmount = ($discountPercentage / 100) * $amount;
-            $finalAmount = $amount - $discountAmount;
-            $installmentAmount = $finalAmount / $installments;
+            // Cálculo do valor a ser cobrado com base na porcentagem
+            $chargeAmount = ($percentage / 100) * $totalAmount;
 
-            // Geração do QR Code Pix
-            $pixPayload = $this->generatePixPayload($finalAmount);
+            // Cálculo do valor de cada parcela
+            $installmentAmount = $chargeAmount / $installments;
+
+            // Geração do QR Code Pix com o valor total a ser cobrado
+            $pixPayload = $this->generatePixPayload($chargeAmount);
 
             // Criação do QR Code
             $qrCode = new QrCode($pixPayload);
@@ -40,7 +41,7 @@ class GerenciarRecursosFinanceiro extends Controller
 
             // Retorno dos dados em formato JSON
             return response()->json([
-                'final_amount' => $finalAmount,
+                'charge_amount' => $chargeAmount,
                 'installment_amount' => $installmentAmount,
                 'qr_code' => $qrCodeData
             ]);
@@ -56,9 +57,9 @@ class GerenciarRecursosFinanceiro extends Controller
     private function generatePixPayload($amount)
     {
         // Substitua essas informações pelos dados da sua chave PIX
-        $pixKey = 'sua-chave-pix-aqui';
-        $merchantName = 'Nome do Advogado';
-        $merchantCity = 'Cidade';
+        $pixKey = '100.990.599-67';
+        $merchantName = 'Gustavo Telles';
+        $merchantCity = 'Londrina';
 
         // Criação do payload do PIX
         $pixPayload = "00020126330014BR.GOV.BCB.PIX0114{$pixKey}5204000053039865405{$amount}5802BR5900{$merchantName}6000{$merchantCity}62070503***6304";

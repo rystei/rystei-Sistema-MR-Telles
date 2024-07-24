@@ -11,15 +11,15 @@
 <body>
     <div class="container mt-5">
         <h2>Gerenciar Recursos Financeiros</h2>
-        <form id="financeForm">
+        <form id="financialForm">
             @csrf
             <div class="form-group">
-                <label for="amount">Valor (R$):</label>
-                <input type="number" class="form-control" id="amount" name="amount" required>
+                <label for="total_amount">Valor Total Recebido:</label>
+                <input type="number" class="form-control" id="total_amount" name="total_amount" required>
             </div>
             <div class="form-group">
-                <label for="discount_percentage">Percentual de Desconto (%):</label>
-                <input type="number" class="form-control" id="discount_percentage" name="discount_percentage" required>
+                <label for="percentage">Porcentagem de Cobrança:</label>
+                <input type="number" class="form-control" id="percentage" name="percentage" required>
             </div>
             <div class="form-group">
                 <label for="installments">Número de Parcelas:</label>
@@ -37,7 +37,7 @@
             }
         });
 
-        $('#financeForm').on('submit', function(e) {
+        $('#financialForm').on('submit', function(e) {
             e.preventDefault();
             $.ajax({
                 url: '/financeiro/calculate',
@@ -46,7 +46,7 @@
                 dataType: 'json',
                 success: function(response) {
                     $('#result').html(`
-                        <p>Valor Final: R$ ${response.final_amount.toFixed(2)}</p>
+                        <p>Valor Total a Ser Cobrado: R$ ${response.charge_amount.toFixed(2)}</p>
                         <p>Valor da Parcela: R$ ${response.installment_amount.toFixed(2)}</p>
                         <div>
                             <h4>QR Code Pix:</h4>
