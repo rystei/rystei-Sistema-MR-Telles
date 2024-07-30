@@ -421,7 +421,7 @@
       </div>
     </div>
   </div>
-  <footer id="contato" class="text-center py-5 mt-5 w-100">
+  <footer id="contato" class="text-center py-5">
   <div class="modal fade" id="modal-1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">

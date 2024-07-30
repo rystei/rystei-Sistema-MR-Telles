@@ -1,14 +1,14 @@
-/* Adiciona um wrapper ao redor do conteúdo da página */
-.wrapper {
-    padding-top: 60px; /* altura da navbar */
-  }
-  
+
   .container-fluid, header {
-    background-color: #816D4F;
+    background-color: #DDB892;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 10;
+  }
+
+  .nav-link {
+    color:#191614
   }
 
 .navbar-brand img {
@@ -23,7 +23,7 @@
 
 body{
     --bege: #E6E0D6;
-    --marrom-escuro: #816D4F;
+    --marrom-escuro: #B08968;
     --marrom-claro: #B29463;
     font-family: 'Barlow', sans-serif;
     height: 4000px;
@@ -52,7 +52,7 @@ input[type="checkbox"]:focus {
 }
 
 .banners-titulo {
-    --bs-bg-opacity: .5;
+    --bs-bg-opacity: .8;
 }
 
 .banner-1 {
@@ -91,3 +91,5 @@ footer {
 .whatsapp-icon {
     font-size: 3em; /* ou qualquer tamanho desejado */
   }
+
+  

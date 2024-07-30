@@ -9,7 +9,9 @@
         "endroid/qr-code": "^5.0",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
-        "simplesoftwareio/simple-qrcode": "^4.2"
+        "piggly/php-pix": "^3.0",
+        "simplesoftwareio/simple-qrcode": "^4.2",
+        "spatie/laravel-webhook-client": "^3.4"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
