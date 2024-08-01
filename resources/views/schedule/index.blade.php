@@ -10,8 +10,12 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="{{ asset('pt-br.global.min.js') }}"></script>
-</head>
+    <link rel="stylesheet" href="estilos/schedules.css">
+</head> 
 <body>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">MR TELLES</a>
+    </nav>
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
@@ -156,36 +160,36 @@
 
         function filterAndDisplayEvents(searchKeywords) {
             console.log(`Procurando por: ${searchKeywords}`);
-                 $.ajax({
-                 method: 'GET',
-                 url: `/events/search?title=${searchKeywords}`,
+            $.ajax({
+                method: 'GET',
+                url: `/events/search?title=${searchKeywords}`,
                 success: function(response) {
-                  console.log('Resposta da busca:', response);
+                    console.log('Resposta da busca:', response);
 
-        // Ir para a data do primeiro evento encontrado
-        calendar.gotoDate(new Date(response[0].start));
+                    // Ir para a data do primeiro evento encontrado
+                    calendar.gotoDate(new Date(response[0].start));
 
-      // Limpar todos os eventos atuais do calendário
-      calendar.removeAllEvents();
+                    // Limpar todos os eventos atuais do calendário
+                    calendar.removeAllEvents();
 
-      // Se não houver resposta, não há eventos para adicionar
-      if (response.length === 0) {
-        console.log('Nenhum evento encontrado.');
-        return;
-      }
+                    // Se não houver resposta, não há eventos para adicionar
+                    if (response.length === 0) {
+                        console.log('Nenhum evento encontrado.');
+                        return;
+                    }
 
-      // Adicionar apenas os eventos correspondentes à busca
-      $.each(response, function(index, searchedEvent) {
-        console.log(`Adicionando evento: ${searchedEvent}`);
-        calendar.addEvent(searchedEvent);
-      });
+                    // Adicionar apenas os eventos correspondentes à busca
+                    $.each(response, function(index, searchedEvent) {
+                        console.log(`Adicionando evento: ${searchedEvent}`);
+                        calendar.addEvent(searchedEvent);
+                    });
 
-    },
-    error: function(xhr, status, error) {
-      console.error(`Erro ao procurar eventos: ${error} (${status})`);
-    }
-  });
-}  
+                },
+                error: function(xhr, status, error) {
+                    console.error(`Erro ao procurar eventos: ${error} (${status})`);
+                }
+            });
+        }  
 
         document.getElementById('exportButton').addEventListener('click', function() {
             var events = calendar.getEvents().map(function(event) {

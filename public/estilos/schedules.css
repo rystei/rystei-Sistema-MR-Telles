@@ -1,0 +1,41 @@
+/* schedules.css */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #EDE0D4;
+}
+
+.navbar {
+    background-color: #343a40; /* Fundo escuro */
+    padding: 1rem; /* Preenchimento para dar mais espaço */
+    display: flex;
+    justify-content: center; /* Centralizar o conteúdo horizontalmente */
+    align-items: center; /* Centralizar o conteúdo verticalmente */
+}
+
+.navbar-brand {
+    font-size: 1.5rem; /* Tamanho do texto */
+    font-weight: bold; /* Negrito */
+    color: #fff; /* Cor do texto */
+    margin-bottom: 0; /* Remover margem inferior */
+}
+
+.input-group {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-group {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+#calendar {
+    margin-top: 20px;
+}

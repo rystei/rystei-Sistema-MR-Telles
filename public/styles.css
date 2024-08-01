@@ -1,19 +1,18 @@
+.container-fluid, header {
+  background-color: #DDB892;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
 
-  .container-fluid, header {
-    background-color: #DDB892;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-  }
-
-  .nav-link {
-    color:#191614
-  }
+.nav-link {
+  color: #191614;
+}
 
 .navbar-brand img {
-    width: 80px; 
-    height: auto;  
+  width: 80px; 
+  height: auto;
 }
 
 .offcanvas-title img {
@@ -27,6 +26,7 @@ body{
     --marrom-claro: #B29463;
     font-family: 'Barlow', sans-serif;
     height: 4000px;
+    background-color: #EDE0D4;
   }
 
 input[type=checkbox] {
@@ -56,15 +56,15 @@ input[type="checkbox"]:focus {
 }
 
 .banner-1 {
-    background-image: url(./img/banner-1.jpg);
+    background-image: url(../img/banner-1.jpg);
 }
 
 .banner-2 {
-    background-image: url(./img/banner-2.jpg);
+    background-image: url(../img/banner-2.jpg);
 }
 
 .banner-3 {
-    background-image: url(./img/banner-3.jpg);
+    background-image: url(../img/banner-3.jpg);
 }
 
 .botao-padrao {
@@ -91,5 +91,3 @@ footer {
 .whatsapp-icon {
     font-size: 3em; /* ou qualquer tamanho desejado */
   }
-
-  

@@ -7,28 +7,56 @@
     <title>Gerenciar Recursos Financeiros</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="estilos/processar_pagamento.css">
 </head>
 <body>
     <div class="container mt-5">
-        <h2>Gerenciar Recursos Financeiros</h2>
-        <form id="financialForm">
-            @csrf
-            <div class="form-group">
-                <label for="total_amount">Valor Total Recebido:</label>
-                <input type="number" class="form-control" id="total_amount" name="total_amount" required>
+        <div class="card">
+            <div class="card-body">
+                <h2>Gerenciar Recursos Financeiros</h2>
+                <form id="financialForm">
+                    @csrf
+                    <div class="form-group">
+                        <label for="total_amount">Valor Total Recebido:</label>
+                        <input type="number" class="form-control" id="total_amount" name="total_amount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="percentage">Porcentagem de Cobrança:</label>
+                        <input type="number" class="form-control" id="percentage" name="percentage" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="installments">Número de Parcelas:</label>
+                        <input type="number" class="form-control" id="installments" name="installments" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Calcular</button>
+                </form>
+                <div id="result" class="mt-4"></div>
             </div>
-            <div class="form-group">
-                <label for="percentage">Porcentagem de Cobrança:</label>
-                <input type="number" class="form-control" id="percentage" name="percentage" required>
-            </div>
-            <div class="form-group">
-                <label for="installments">Número de Parcelas:</label>
-                <input type="number" class="form-control" id="installments" name="installments" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Calcular</button>
-        </form>
-        <div id="result" class="mt-4"></div>
+        </div>
     </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="qrCodeModal" tabindex="-1" role="dialog" aria-labelledby="qrCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="qrCodeModalLabel">QR Code Pix</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="qrCodeImage" src="" alt="QR Code Pix">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
     $(document).ready(function() {
         $.ajaxSetup({
@@ -48,11 +76,14 @@
                     $('#result').html(`
                         <p>Valor Total a Ser Cobrado: R$ ${response.charge_amount.toFixed(2)}</p>
                         <p>Valor da Parcela: R$ ${response.installment_amount.toFixed(2)}</p>
-                        <div>
-                            <h4>QR Code Pix:</h4>
-                            <img src="data:image/png;base64,${response.qr_code}" alt="QR Code Pix">
-                        </div>
+                        <button class="btn btn-success" id="showQrCode">Mostrar QR Code</button>
                     `);
+
+                    $('#qrCodeImage').attr('src', 'data:image/png;base64,' + response.qr_code);
+
+                    $('#showQrCode').on('click', function() {
+                        $('#qrCodeModal').modal('show');
+                    });
                 },
                 error: function(xhr) {
                     var errorHtml = '<div class="alert alert-danger">Erro ao calcular. Verifique os dados e tente novamente.</div>';
