@@ -14,8 +14,6 @@ Route::get('/', function () {
 Route::get('/financeiro', function () {
     return view('financeiro.index');
 });
-
-// Rota para calcular os valores financeiros
 Route::post('/financeiro/calculate', [GerenciarRecursosFinanceiro::class, 'calculate']);
 
 //Gerenciar compromissos

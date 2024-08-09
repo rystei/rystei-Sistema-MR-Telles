@@ -16,40 +16,37 @@ class GerenciarRecursosFinanceiro extends Controller
             'installments' => 'required|integer|min:1'
         ]);
 
-        try {
-            $totalAmount = $request->input('total_amount');
-            $percentage = $request->input('percentage');
-            $installments = $request->input('installments');
+        $totalAmount = $request->input('total_amount');
+        $percentage = $request->input('percentage');
+        $installments = $request->input('installments');
 
-            $chargeAmount = ($percentage / 100) * $totalAmount;
-            $installmentAmount = $chargeAmount / $installments;
+        // Calcula o valor da cobrança e o valor da parcela
+        $chargeAmount = ($percentage / 100) * $totalAmount;
+        $installmentAmount = $chargeAmount / $installments;
 
-            $pixPayload = $this->generatePixPayload($chargeAmount);
+        // Gera o payload Pix
+        $pixPayload = $this->generatePixPayload($chargeAmount);
 
-            $qrCode = new QrCode($pixPayload);
-            $writer = new PngWriter();
-            $result = $writer->write($qrCode);
+        // Gera o QR Code
+        $qrCode = new QrCode($pixPayload);
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
 
-            $qrCodeData = base64_encode($result->getString());
+        // Codifica o QR Code em base64
+        $qrCodeData = base64_encode($result->getString());
 
-            return response()->json([
-                'charge_amount' => $chargeAmount,
-                'installment_amount' => $installmentAmount,
-                'qr_code' => $qrCodeData
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Erro interno no servidor. Por favor, tente novamente mais tarde.'
-            ], 500);
-        }
+        return response()->json([
+            'charge_amount' => $chargeAmount,
+            'installment_amount' => $installmentAmount,
+            'qr_code' => $qrCodeData
+        ]);
     }
 
     private function generatePixPayload($amount)
     {
-        $pixKey = 'gustavo208cardoso@gmail.com';
-        $merchantName = 'Gustavo Cardoso Telles';
-        $merchantCity = 'Londrina';
+        $pixKey = env('PIX_KEY');
+        $merchantName = env('MERCHANT_NAME');
+        $merchantCity = env('MERCHANT_CITY');
 
         $merchantName = substr($merchantName, 0, 25);
         $merchantCity = substr($merchantCity, 0, 15);
@@ -57,9 +54,9 @@ class GerenciarRecursosFinanceiro extends Controller
         $formattedAmount = number_format($amount, 2, '.', '');
 
         $pixPayload = "000201"
-            . "26360014BR.GOV.BCB.PIX0114{$pixKey}"
+            . "26490014BR.GOV.BCB.PIX0127{$pixKey}"
             . "520400005303986"
-            . "5405" . str_pad($formattedAmount, 10, '0', STR_PAD_LEFT)
+            . "5404{$formattedAmount}"
             . "5802BR"
             . "59" . str_pad(strlen($merchantName), 2, '0', STR_PAD_LEFT) . $merchantName
             . "60" . str_pad(strlen($merchantCity), 2, '0', STR_PAD_LEFT) . $merchantCity
