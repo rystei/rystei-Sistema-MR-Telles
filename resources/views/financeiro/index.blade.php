@@ -7,6 +7,7 @@
     <title>Gerenciar Recursos Financeiros</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <link rel="stylesheet" href="estilos/processar_pagamento.css">
 </head>
 <body>
@@ -18,7 +19,7 @@
                     @csrf
                     <div class="form-group">
                         <label for="total_amount">Valor Total Recebido:</label>
-                        <input type="number" class="form-control" id="total_amount" name="total_amount" required>
+                        <input type="text" class="form-control" id="total_amount" name="total_amount" required>
                     </div>
                     <div class="form-group">
                         <label for="percentage">Porcentagem de Cobrança:</label>
@@ -59,6 +60,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
     $(document).ready(function() {
+        // Aplica a máscara no campo de valor total recebido
+        $('#total_amount').mask('000.000.000.000.000,00', {reverse: true});
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -74,8 +78,8 @@
                 dataType: 'json',
                 success: function(response) {
                     $('#result').html(`
-                        <p>Valor Total a Ser Cobrado: R$ ${response.charge_amount.toFixed(2)}</p>
-                        <p>Valor da Parcela: R$ ${response.installment_amount.toFixed(2)}</p>
+                        <p>Valor Total a Ser Cobrado: R$ ${response.charge_amount}</p>
+                        <p>Valor da Parcela: R$ ${response.installment_amount}</p>
                         <button class="btn btn-success" id="showQrCode">Mostrar QR Code</button>
                     `);
 
