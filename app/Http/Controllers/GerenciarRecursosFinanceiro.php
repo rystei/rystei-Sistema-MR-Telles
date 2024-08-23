@@ -15,33 +15,35 @@ class GerenciarRecursosFinanceiro extends Controller
             'percentage' => 'required|numeric|min:0|max:100',
             'installments' => 'required|integer|min:1'
         ]);
-
+    
         // Remove pontos e substitui vírgula por ponto no valor total
         $totalAmount = str_replace(['.', ','], ['', '.'], $request->input('total_amount'));
         $percentage = $request->input('percentage');
         $installments = $request->input('installments');
-
-        // Calcula o valor da cobrança e o valor da parcela
-        $chargeAmount = ($percentage / 100) * $totalAmount;
+    
+        // Calcula o valor total a ser cobrado aplicando a porcentagem ao valor total recebido
+        $chargeAmount = $totalAmount * ($percentage / 100);
+    
+        // Calcula o valor de cada parcela
         $installmentAmount = $chargeAmount / $installments;
-
-        // Gera o payload Pix
-        $pixPayload = $this->generatePixPayload($chargeAmount);
-
+    
+        // Gera o payload Pix com o valor da parcela
+        $pixPayload = $this->generatePixPayload($installmentAmount); // Gera o QR Code com o valor da parcela
+    
         // Gera o QR Code
         $qrCode = new QrCode($pixPayload);
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
-
+    
         // Codifica o QR Code em base64
         $qrCodeData = base64_encode($result->getString());
-
+    
         return response()->json([
-            'charge_amount' => number_format($chargeAmount, 2, ',', '.'),
-            'installment_amount' => number_format($installmentAmount, 2, ',', '.'),
-            'qr_code' => $qrCodeData
+            'charge_amount' => number_format($chargeAmount, 2, ',', '.'),  // Valor total formatado
+            'installment_amount' => number_format($installmentAmount, 2, ',', '.'),  // Valor de cada parcela formatado
+            'qr_code' => $qrCodeData  // QR Code gerado
         ]);
-    }
+    }    
 
     private function generatePixPayload($amount)
 {
