@@ -15,7 +15,6 @@
     height: auto;
   }
   
-  /* Adiciona um padding-top ao conteúdo principal */
   .content {
-    padding-top: 70px; /* Ajuste este valor conforme a altura da navbar */
+    padding-top: 70px;
   }

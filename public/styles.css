@@ -80,14 +80,14 @@ footer {
 }
 
 #contato .container {
-  padding: 5rem !important; /* Aumenta o padding da seção container */
+  padding: 5rem !important;
   
 }
 
 #contato .p-5 {
-  padding: 5rem !important; /* Aumenta o padding interno do div */
+  padding: 5rem !important;
 }
 
 .whatsapp-icon {
-    font-size: 3em; /* ou qualquer tamanho desejado */
+    font-size: 3em;
   }

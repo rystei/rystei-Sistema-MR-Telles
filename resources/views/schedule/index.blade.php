@@ -190,7 +190,7 @@
                 }
             });
         }  
-
+        
         document.getElementById('exportButton').addEventListener('click', function() {
             var events = calendar.getEvents().map(function(event) {
                 return {
@@ -219,6 +219,8 @@
             downloadLink.download = 'events.xlsx';
             downloadLink.click();
         });
+
+        
     </script>
 </body>
 </html>

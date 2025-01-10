@@ -18,10 +18,10 @@ class ScheduleFactory extends Factory
     {
         $startTimestamp = $this->faker->dateTimeBetween('now', '+1 month')->getTimestamp();
         $endTimestamp = $this->faker->dateTimeBetween('@' . $startTimestamp, '@' . ($startTimestamp + 86400))->getTimestamp();
-
-        $startDate = date('Y-m-d', $startTimestamp);
-        $endDate = date('Y-m-d', $endTimestamp);
-
+    
+        $startDate = date('Y-m-d H:i:s', $startTimestamp);
+        $endDate = date('Y-m-d H:i:s', $endTimestamp);
+    
         return [
             'title' => $this->faker->sentence,
             'start' => $startDate,

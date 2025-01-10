@@ -33,10 +33,12 @@
         <input type='text' class='form-control' id='title' name='title' required>
 
         <label for="start">{{__('Início')}}</label>
-        <input type='date' class='form-control' id='start' name='start' required value='{{ now()->toDateString() }}'>
+        <input type='datetime-local' class='form-control' id='start' name='start' 
+                required value="{{ now()->format('Y-m-d\TH:i') }}">
 
         <label for="end">{{__('Fim')}}</label>
-        <input type='date' class='form-control' id='end' name='end' required value='{{ now()->toDateString() }}'>
+        <input type='datetime-local' class='form-control' id='end' name='end' 
+                required value="{{ now()->format('Y-m-d\TH:i') }}">
 
 
         <label for="description">{{__('Descrição')}}</label>
