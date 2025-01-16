@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="{{ asset('pt-br.global.min.js') }}"></script>
     <link rel="stylesheet" href="estilos/schedules.css">
-</head> 
+</head>
 <body>
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="#">MR TELLES</a>
@@ -52,19 +52,25 @@
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             locale: 'pt-br',
+            timeZone: 'local',
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             initialView: 'dayGridMonth',
-            timeZone: 'UTC',
             editable: true,
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                meridiem: false
+            },
 
             eventContent: function(info) {
                 var eventTitle = info.event.title;
+                var eventTime = info.event.start ? info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
                 var eventElement = document.createElement('div');
-                eventElement.innerHTML = '<span style="cursor: pointer;">❌</span> ' + eventTitle;
+                eventElement.innerHTML = `<span style="cursor: pointer;">❌</span> ${eventTime} ${eventTitle}`;
 
                 eventElement.querySelector('span').addEventListener('click', function() {
                     if (confirm("Você tem certeza que gostaria de deletar esse evento?")) {
@@ -72,10 +78,7 @@
                         $.ajax({
                             method: 'DELETE',
                             url: '/schedule/' + eventId,
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            success: function(response) {
+                            success: function() {
                                 console.log('Evento deletado com sucesso.');
                                 calendar.refetchEvents();
                             },
@@ -85,54 +88,26 @@
                         });
                     }
                 });
-                return {
-                    domNodes: [eventElement]
-                };
+                return { domNodes: [eventElement] };
             },
-            
+
             eventDrop: function(info) {
                 var eventId = info.event.id;
                 var newStartDate = info.event.start;
                 var newEndDate = info.event.end || newStartDate;
-                var newStartDateUTC = newStartDate.toISOString().slice(0, 10);
-                var newEndDateUTC = newEndDate.toISOString().slice(0, 10);
 
                 $.ajax({
                     method: 'PUT',
                     url: `/schedule/${eventId}`,
                     data: {
-                        '_token': "{{ csrf_token() }}",
-                        start_date: newStartDateUTC,
-                        end_date: newEndDateUTC,
+                        start_date: newStartDate.toISOString(),
+                        end_date: newEndDate.toISOString()
                     },
                     success: function() {
                         console.log('Evento movido com sucesso.');
                     },
                     error: function(error) {
                         console.error('Erro ao mover o evento:', error);
-                    }
-                });
-            },
-
-            eventResize: function(info) {
-                var eventId = info.event.id;
-                var newEndDate = info.event.end;
-                var newEndDateUTC = newEndDate.toISOString().slice(0, 10);
-
-                $.ajax({
-                    method: 'PUT',
-                    url: `/schedule/${eventId}/resize`,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    data: {
-                        end_date: newEndDateUTC
-                    },
-                    success: function() {
-                        console.log('Evento redimensionado com sucesso.');
-                    },
-                    error: function(error) {
-                        console.error('Erro no redimensionamento do evento:', error);
                     }
                 });
             },
@@ -155,49 +130,27 @@
 
         document.getElementById('searchButton').addEventListener('click', function() {
             var searchKeywords = document.getElementById('searchInput').value.toLowerCase();
-            filterAndDisplayEvents(searchKeywords);
-        });
-
-        function filterAndDisplayEvents(searchKeywords) {
-            console.log(`Procurando por: ${searchKeywords}`);
             $.ajax({
                 method: 'GET',
                 url: `/events/search?title=${searchKeywords}`,
                 success: function(response) {
-                    console.log('Resposta da busca:', response);
-
-                    // Ir para a data do primeiro evento encontrado
-                    calendar.gotoDate(new Date(response[0].start));
-
-                    // Limpar todos os eventos atuais do calendário
                     calendar.removeAllEvents();
-
-                    // Se não houver resposta, não há eventos para adicionar
-                    if (response.length === 0) {
-                        console.log('Nenhum evento encontrado.');
-                        return;
-                    }
-
-                    // Adicionar apenas os eventos correspondentes à busca
-                    $.each(response, function(index, searchedEvent) {
-                        console.log(`Adicionando evento: ${searchedEvent}`);
-                        calendar.addEvent(searchedEvent);
-                    });
-
+                    calendar.addEventSource(response);
+                    calendar.gotoDate(response.length > 0 ? response[0].start : new Date());
                 },
-                error: function(xhr, status, error) {
-                    console.error(`Erro ao procurar eventos: ${error} (${status})`);
+                error: function(xhr) {
+                    console.error('Erro ao buscar eventos:', xhr);
                 }
             });
-        }  
-        
+        });
+
         document.getElementById('exportButton').addEventListener('click', function() {
             var events = calendar.getEvents().map(function(event) {
                 return {
                     title: event.title,
-                    start: event.start ? event.start.toISOString() : null,
-                    end: event.end ? event.end.toISOString() : null,
-                    color: event.backgroundColor,
+                    start: event.start ? event.start.toISOString() : '',
+                    end: event.end ? event.end.toISOString() : '',
+                    color: event.backgroundColor
                 };
             });
 
@@ -205,22 +158,8 @@
             var ws = XLSX.utils.json_to_sheet(events);
             XLSX.utils.book_append_sheet(wb, ws, 'Events');
 
-            var arrayBuffer = XLSX.write(wb, {
-                bookType: 'xlsx',
-                type: 'array'
-            });
-
-            var blob = new Blob([arrayBuffer], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
-
-            var downloadLink = document.createElement('a');
-            downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = 'events.xlsx';
-            downloadLink.click();
+            XLSX.writeFile(wb, 'events.xlsx');
         });
-
-        
     </script>
 </body>
 </html>
