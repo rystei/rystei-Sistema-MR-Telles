@@ -7,13 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Schedule extends Model
 {
-    use HasFactory;
+    protected $fillable = ['title', 'start', 'end', 'description', 'color', 'all_day'];
 
-    protected $fillable = [
-        'title',
-        'start',  
-        'end',
-        'description',
-        'cor',
+    protected $casts = [
+        'all_day' => 'boolean', // Converte automaticamente para true/false
     ];
 }

@@ -36,9 +36,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/controle-financeiro', [ControleFinanceiroController::class, 'store'])->name('controle_financeiro.store');
     Route::patch('/controle-financeiro/{id}/atualizar-status', [ControleFinanceiroController::class, 'atualizarStatus'])->name('controle_financeiro.update_status');
 
-    // teste cliente
-    Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
-    Route::post('/clientes/store', [ClienteController::class, 'store'])->name('clientes.store');
 
     // Gerenciar compromissos
     Route::get('/AgendarCompromissos', [ScheduleController::class, 'index'])->name('agendar_compromissos');
@@ -48,8 +45,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/schedule/{id}/resize', [ScheduleController::class, 'resize']);
     Route::get('/events/search', [ScheduleController::class, 'search']);
     Route::view('add-schedule', 'schedule.add');
-    Route::post('create-schedule', [ScheduleController::class, 'create']);
+    Route::post('create-schedule', [ScheduleController::class, 'store'])->name('schedule.store');
     Route::get('/adicionar', [ScheduleController::class, 'add']);
 });
+
+    // teste cliente
+    Route::get('/clientes/create', [ClienteController::class, 'create'])->name('clientes.create');
+    Route::post('/clientes/store', [ClienteController::class, 'store'])->name('clientes.store');
+
 
 require __DIR__.'/auth.php';

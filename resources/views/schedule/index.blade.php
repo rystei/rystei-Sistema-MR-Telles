@@ -16,6 +16,7 @@
     <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="#">MR TELLES</a>
     </nav>
+
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
@@ -27,17 +28,40 @@
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="btn-group mb-3" role="group" aria-label="Calendar Actions">
+                <div class="btn-group mb-3" role="group">
                     <button id="exportButton" class="btn btn-success">{{ __('Exportar Calendário') }}</button>
                 </div>
-                <div class="btn-group mb-3" role="group" aria-label="Calendar Actions">
+                <div class="btn-group mb-3" role="group">
                     <a href="{{ URL('add-schedule') }}" class="btn btn-success">{{ __('Adicionar Evento') }}</a>
                 </div>
             </div>
         </div>
+
         <div class="card">
             <div class="card-body">
                 <div id="calendar" style="width: 100%; height: 100vh;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA DETALHES DO EVENTO -->
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Início:</strong> <span id="eventStart"></span></p>
+                    <p><strong>Fim:</strong> <span id="eventEnd"></span></p>
+                    <p><strong>Descrição:</strong> <span id="eventDescription"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -60,56 +84,21 @@
             },
             initialView: 'dayGridMonth',
             editable: true,
-            eventTimeFormat: {
-                hour: '2-digit',
-                minute: '2-digit',
-                meridiem: false
-            },
+            eventTimeFormat: { hour: '2-digit', minute: '2-digit', meridiem: false },
 
-            eventContent: function(info) {
-                var eventTitle = info.event.title;
-                var eventTime = info.event.start ? info.event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-                var eventElement = document.createElement('div');
-                eventElement.innerHTML = `<span style="cursor: pointer;">❌</span> ${eventTime} ${eventTitle}`;
+            eventClick: function(info) {
+                $('#eventTitle').text(info.event.title);
 
-                eventElement.querySelector('span').addEventListener('click', function() {
-                    if (confirm("Você tem certeza que gostaria de deletar esse evento?")) {
-                        var eventId = info.event.id;
-                        $.ajax({
-                            method: 'DELETE',
-                            url: '/schedule/' + eventId,
-                            success: function() {
-                                console.log('Evento deletado com sucesso.');
-                                calendar.refetchEvents();
-                            },
-                            error: function(error) {
-                                console.error('Erro ao deletar o evento', error);
-                            }
-                        });
-                    }
-                });
-                return { domNodes: [eventElement] };
-            },
+                if (info.event.allDay) {
+                    $('#eventStart').text('Evento de dia inteiro');
+                    $('#eventEnd').text('');
+                } else {
+                    $('#eventStart').text(info.event.start.toLocaleString());
+                    $('#eventEnd').text(info.event.end ? info.event.end.toLocaleString() : 'Sem horário definido');
+                }
 
-            eventDrop: function(info) {
-                var eventId = info.event.id;
-                var newStartDate = info.event.start;
-                var newEndDate = info.event.end || newStartDate;
-
-                $.ajax({
-                    method: 'PUT',
-                    url: `/schedule/${eventId}`,
-                    data: {
-                        start_date: newStartDate.toISOString(),
-                        end_date: newEndDate.toISOString()
-                    },
-                    success: function() {
-                        console.log('Evento movido com sucesso.');
-                    },
-                    error: function(error) {
-                        console.error('Erro ao mover o evento:', error);
-                    }
-                });
+                $('#eventDescription').text(info.event.extendedProps.description || 'Sem descrição');
+                $('#eventModal').modal('show');
             },
 
             events: function(fetchInfo, successCallback, failureCallback) {
@@ -117,6 +106,15 @@
                     url: '/events',
                     method: 'GET',
                     success: function(response) {
+                        response = response.map(event => {
+                            if (!event.start) {
+                                event.start = new Date().toISOString().split('T')[0];
+                                event.allDay = true;
+                            } else {
+                                event.allDay = event.allDay ?? false;
+                            }
+                            return event;
+                        });
                         successCallback(response);
                     },
                     error: function(error) {
@@ -128,8 +126,8 @@
 
         calendar.render();
 
-        document.getElementById('searchButton').addEventListener('click', function() {
-            var searchKeywords = document.getElementById('searchInput').value.toLowerCase();
+        $('#searchButton').on('click', function() {
+            var searchKeywords = $('#searchInput').val().toLowerCase();
             $.ajax({
                 method: 'GET',
                 url: `/events/search?title=${searchKeywords}`,
@@ -144,7 +142,7 @@
             });
         });
 
-        document.getElementById('exportButton').addEventListener('click', function() {
+        $('#exportButton').on('click', function() {
             var events = calendar.getEvents().map(function(event) {
                 return {
                     title: event.title,
@@ -157,9 +155,12 @@
             var wb = XLSX.utils.book_new();
             var ws = XLSX.utils.json_to_sheet(events);
             XLSX.utils.book_append_sheet(wb, ws, 'Events');
-
             XLSX.writeFile(wb, 'events.xlsx');
         });
     </script>
+
+    <!-- Scripts do Bootstrap para funcionamento do modal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

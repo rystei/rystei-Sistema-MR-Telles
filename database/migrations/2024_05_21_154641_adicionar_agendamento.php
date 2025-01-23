@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->date('start');
-            $table->date('end');
+            $table->datetime('start')->nullable();
+            $table->datetime('end')->nullable();
+            $table->boolean('all_day')->default(false); // Adicionado diretamente aqui
             $table->text('description')->nullable();
             $table->string('color')->nullable();
             $table->timestamps();
