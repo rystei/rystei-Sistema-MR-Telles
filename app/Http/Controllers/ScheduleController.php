@@ -61,8 +61,26 @@ class ScheduleController extends Controller
     {
         $schedule = Schedule::findOrFail($id);
         $schedule->delete();
-
+    
         return response()->json(['message' => 'Evento deletado com sucesso']);
+    }
+
+        // Atualiza um evento
+    public function updateEvent(Request $request, $id)
+    {
+        $schedule = Schedule::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'start' => 'required|date',
+            'end' => 'nullable|date|after_or_equal:start',
+            'description' => 'nullable|string',
+            'color' => 'nullable|string'
+        ]);
+
+        $schedule->update($validated);
+
+        return response()->json(['message' => 'Evento atualizado com sucesso']);
     }
 
     // Atualiza as datas de um evento arrastado

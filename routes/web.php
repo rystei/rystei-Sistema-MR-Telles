@@ -40,6 +40,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Gerenciar compromissos
     Route::get('/AgendarCompromissos', [ScheduleController::class, 'index'])->name('agendar_compromissos');
     Route::get('/events', [ScheduleController::class, 'getEvents']);
+    Route::get('/events', [ScheduleController::class, 'getEvents']);
+    Route::put('/events/update/{id}', [ScheduleController::class, 'updateEvent']);
+    Route::delete('/events/delete/{id}', [ScheduleController::class, 'deleteEvent']);
     Route::delete('/schedule/{id}', [ScheduleController::class, 'deleteEvent']);
     Route::put('/schedule/{id}', [ScheduleController::class, 'update']);
     Route::put('/schedule/{id}/resize', [ScheduleController::class, 'resize']);
@@ -47,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('add-schedule', 'schedule.add');
     Route::post('create-schedule', [ScheduleController::class, 'store'])->name('schedule.store');
     Route::get('/adicionar', [ScheduleController::class, 'add']);
+    
 });
 
     // teste cliente

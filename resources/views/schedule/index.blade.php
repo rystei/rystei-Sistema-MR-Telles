@@ -44,122 +44,159 @@
         </div>
     </div>
 
-    <!-- MODAL PARA DETALHES DO EVENTO -->
-    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <!-- MODAL PARA EDIÇÃO DE EVENTO -->
+    <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="eventTitle"></h5>
+                    <h5 class="modal-title" id="editEventLabel">Editar Evento</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Início:</strong> <span id="eventStart"></span></p>
-                    <p><strong>Fim:</strong> <span id="eventEnd"></span></p>
-                    <p><strong>Descrição:</strong> <span id="eventDescription"></span></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <form id="editEventForm">
+                        <input type="hidden" id="event_id">
+                        
+                        <div class="mb-3">
+                            <label for="edit_title">Título</label>
+                            <input type="text" class="form-control" id="edit_title" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_start">Início</label>
+                            <input type="datetime-local" class="form-control" id="edit_start">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_end">Fim</label>
+                            <input type="datetime-local" class="form-control" id="edit_end">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_description">Descrição</label>
+                            <textarea class="form-control" id="edit_description"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit_color">Cor</label>
+                            <input type="color" id="edit_color" class="form-control" value="#ff0000">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="button" id="deleteEvent" class="btn btn-danger">Excluir</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="text/javascript">
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            locale: 'pt-br',
-            timeZone: 'local',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            initialView: 'dayGridMonth',
-            editable: true,
-            eventTimeFormat: { hour: '2-digit', minute: '2-digit', meridiem: false },
-
-            eventClick: function(info) {
-                $('#eventTitle').text(info.event.title);
-
-                if (info.event.allDay) {
-                    $('#eventStart').text('Evento de dia inteiro');
-                    $('#eventEnd').text('');
-                } else {
-                    $('#eventStart').text(info.event.start.toLocaleString());
-                    $('#eventEnd').text(info.event.end ? info.event.end.toLocaleString() : 'Sem horário definido');
+    <!-- JavaScript -->
+    <script>
+        $(document).ready(function() {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
+            });
 
-                $('#eventDescription').text(info.event.extendedProps.description || 'Sem descrição');
-                $('#eventModal').modal('show');
-            },
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'pt-br',
+                timeZone: 'local',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                initialView: 'dayGridMonth',
+                editable: true,
+                eventClick: function(info) {
+                    $('#event_id').val(info.event.id);
+                    $('#edit_title').val(info.event.title);
+                    $('#edit_start').val(info.event.start.toISOString().slice(0, 16));
+                    $('#edit_end').val(info.event.end ? info.event.end.toISOString().slice(0, 16) : '');
+                    $('#edit_description').val(info.event.extendedProps.description || '');
+                    $('#edit_color').val(info.event.backgroundColor);
+                    $('#editEventModal').modal('show');
+                },
+                events: function(fetchInfo, successCallback, failureCallback) {
+                    $.ajax({
+                        url: '/events',
+                        method: 'GET',
+                        success: function(response) {
+                            successCallback(response);
+                        },
+                        error: function(error) {
+                            failureCallback(error);
+                        }
+                    });
+                }
+            });
 
-            events: function(fetchInfo, successCallback, failureCallback) {
+            calendar.render();
+
+            $('#editEventForm').submit(function(event) {
+                event.preventDefault();
+                var eventData = {
+                    id: $('#event_id').val(),
+                    title: $('#edit_title').val(),
+                    start: $('#edit_start').val(),
+                    end: $('#edit_end').val(),
+                    description: $('#edit_description').val(),
+                    color: $('#edit_color').val()
+                };
+
                 $.ajax({
-                    url: '/events',
-                    method: 'GET',
+                    url: '/events/update/' + eventData.id,
+                    method: 'PUT',
+                    data: eventData,
                     success: function(response) {
-                        response = response.map(event => {
-                            if (!event.start) {
-                                event.start = new Date().toISOString().split('T')[0];
-                                event.allDay = true;
-                            } else {
-                                event.allDay = event.allDay ?? false;
-                            }
-                            return event;
-                        });
-                        successCallback(response);
+                        $('#editEventModal').modal('hide');
+                        calendar.refetchEvents();
                     },
-                    error: function(error) {
-                        failureCallback(error);
+                    error: function(xhr) {
+                        console.error('Erro ao atualizar evento:', xhr);
                     }
                 });
-            }
-        });
+            });
 
-        calendar.render();
+            $('#deleteEvent').click(function() {
+                var eventId = $('#event_id').val();
 
-        $('#searchButton').on('click', function() {
-            var searchKeywords = $('#searchInput').val().toLowerCase();
-            $.ajax({
-                method: 'GET',
-                url: `/events/search?title=${searchKeywords}`,
-                success: function(response) {
-                    calendar.removeAllEvents();
-                    calendar.addEventSource(response);
-                    calendar.gotoDate(response.length > 0 ? response[0].start : new Date());
-                },
-                error: function(xhr) {
-                    console.error('Erro ao buscar eventos:', xhr);
+                if (confirm('Tem certeza que deseja excluir este evento?')) {
+                    $.ajax({
+                        url: '/events/delete/' + eventId,
+                        method: 'DELETE',
+                        success: function(response) {
+                            $('#editEventModal').modal('hide');
+                            calendar.refetchEvents();
+                        },
+                        error: function(xhr) {
+                            console.error('Erro ao excluir evento:', xhr);
+                        }
+                    });
                 }
             });
-        });
 
-        $('#exportButton').on('click', function() {
-            var events = calendar.getEvents().map(function(event) {
-                return {
-                    title: event.title,
-                    start: event.start ? event.start.toISOString() : '',
-                    end: event.end ? event.end.toISOString() : '',
-                    color: event.backgroundColor
-                };
+            $('#searchButton').on('click', function() {
+                var searchKeywords = $('#searchInput').val().toLowerCase();
+                $.ajax({
+                    method: 'GET',
+                    url: `/events/search?title=${searchKeywords}`,
+                    success: function(response) {
+                        calendar.removeAllEvents();
+                        calendar.addEventSource(response);
+                        calendar.gotoDate(response.length > 0 ? response[0].start : new Date());
+                    },
+                    error: function(xhr) {
+                        console.error('Erro ao buscar eventos:', xhr);
+                    }
+                });
             });
-
-            var wb = XLSX.utils.book_new();
-            var ws = XLSX.utils.json_to_sheet(events);
-            XLSX.utils.book_append_sheet(wb, ws, 'Events');
-            XLSX.writeFile(wb, 'events.xlsx');
         });
     </script>
 
-    <!-- Scripts do Bootstrap para funcionamento do modal -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
