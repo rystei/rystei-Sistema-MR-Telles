@@ -66,22 +66,62 @@ class ScheduleController extends Controller
     }
 
         // Atualiza um evento
-    public function updateEvent(Request $request, $id)
+            public function updateEvent(Request $request, $id)
     {
         $schedule = Schedule::findOrFail($id);
 
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'start' => 'required|date',
-            'end' => 'nullable|date|after_or_equal:start',
-            'description' => 'nullable|string',
-            'color' => 'nullable|string'
+        // Determine se o evento é all-day com base no checkbox
+        $allDay = filter_var($request->input('all_day', false), FILTER_VALIDATE_BOOLEAN);
+
+        // Defina regras de validação de acordo com o tipo de evento
+        if ($allDay) {
+            $rules = [
+                'title'       => 'required|string|max:255',
+                'start'       => 'required|date_format:Y-m-d', // Ex: "2025-02-10"
+                'end'         => 'nullable|date_format:Y-m-d|after_or_equal:start',
+                'description' => 'nullable|string',
+                'color'       => 'nullable|string',
+                'all_day'     => 'sometimes|boolean'
+            ];
+        } else {
+            $rules = [
+                'title'       => 'required|string|max:255',
+                'start'       => 'required|date_format:Y-m-d\TH:i', // Ex: "2025-02-10T14:30"
+                'end'         => 'nullable|date_format:Y-m-d\TH:i|after_or_equal:start',
+                'description' => 'nullable|string',
+                'color'       => 'nullable|string',
+                'all_day'     => 'sometimes|boolean'
+            ];
+        }
+
+        $validated = $request->validate($rules);
+
+        // Converte as datas usando Carbon
+        if ($allDay) {
+            // Para evento all-day, usa o formato "Y-m-d"
+            $start = Carbon::createFromFormat('Y-m-d', $validated['start'])->startOfDay();
+            $end = !empty($validated['end'])
+                ? Carbon::createFromFormat('Y-m-d', $validated['end'])->endOfDay()
+                : $start->copy()->endOfDay();
+        } else {
+            // Para evento com horário, usa o formato "Y-m-d\TH:i"
+            $start = Carbon::createFromFormat('Y-m-d\TH:i', $validated['start']);
+            $end = !empty($validated['end'])
+                ? Carbon::createFromFormat('Y-m-d\TH:i', $validated['end'])
+                : $start->copy();
+        }
+
+        $schedule->update([
+            'title'       => $validated['title'],
+            'start'       => $start->toDateTimeString(), // "Y-m-d H:i:s"
+            'end'         => $end->toDateTimeString(),
+            'description' => $validated['description'] ?? null,
+            'color'       => $validated['color'],
+            'all_day'     => $allDay ? 1 : 0,
         ]);
 
-        $schedule->update($validated);
-
         return response()->json(['message' => 'Evento atualizado com sucesso']);
-    }
+    }    
 
     // Atualiza as datas de um evento arrastado
     public function update(Request $request, $id)

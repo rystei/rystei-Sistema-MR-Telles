@@ -86,11 +86,12 @@
             </div>
 
             <div class="mb-3">
-                <label for="color">Cor</label>
-                <div class="color-picker">
-                    <input type="color" id="color" name="color" value="#ff0000" class="form-control shadow-sm" style="max-width: 80px;">
-                    <div class="color-preview" id="colorPreview" style="background-color: #ff0000;"></div>
-                </div>
+                        <label for="edit_color">Tipo de Evento</label>
+                        <select id="edit_color" class="form-control">
+                            <option value="#28a745">Normal</option>  <!-- Verde -->
+                            <option value="#ffc107">Importante</option>  <!-- Amarelo -->
+                            <option value="#dc3545">Muito Importante</option>  <!-- Vermelho -->
+                        </select>
             </div>
 
             <button type="submit" class="btn btn-success">Salvar Evento</button>
