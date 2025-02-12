@@ -164,12 +164,15 @@ class ScheduleController extends Controller
     // Busca eventos com base no título
     public function search(Request $request)
     {
-        $searchKeywords = $request->input('title');
-
-        $matchingEvents = Schedule::where('title', 'like', '%' . $searchKeywords . '%')->get();
-
+        $searchKeywords = strtolower($request->input('title')); // converte para minúsculas
+    
+        $matchingEvents = Schedule::whereRaw("LOWER(title) LIKE ?", ['%' . $searchKeywords . '%'])
+            ->orWhereRaw("LOWER(description) LIKE ?", ['%' . $searchKeywords . '%'])
+            ->get();
+    
         return response()->json($matchingEvents);
     }
+    
 
     // Criação de um evento via requisição AJAX
     public function store(Request $request)

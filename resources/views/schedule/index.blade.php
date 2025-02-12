@@ -268,24 +268,124 @@
         }
       });
 
-      $('#searchButton').on('click', function() {
-        var searchKeywords = $('#searchInput').val().toLowerCase();
-        $.ajax({
-          method: 'GET',
-          url: `/events/search?title=${searchKeywords}`,
-          success: function(response) {
-            if (response.length > 0) {
-              calendar.removeAllEvents();
-              calendar.addEventSource(response);
-              calendar.gotoDate(response[0].start);
-            }
-          },
-          error: function(xhr) {
-            console.error('Erro ao buscar eventos:', xhr);
-          }
-        });
-      });
+// Função auxiliar para realizar a busca
+function fetchOriginalEvents(fetchInfo, successCallback, failureCallback) {
+    $.ajax({
+      url: '/events',
+      method: 'GET',
+      success: function(response) {
+        successCallback(response);
+      },
+      error: function(error) {
+        console.error('Erro ao carregar eventos:', error);
+        failureCallback(error);
+      }
     });
+  }
+
+  // Inicialize o calendário usando a fonte original
+  $(document).ready(function() {
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      locale: 'pt-br',
+      timeZone: 'America/Sao_Paulo',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      initialView: 'dayGridMonth',
+      editable: true,
+      // Configuramos a propriedade events para usar nossa função original
+      events: fetchOriginalEvents,
+      eventClick: function(info) {
+        $('#event_id').val(info.event.id);
+        $('#edit_title').val(info.event.title);
+        $('#edit_allDay').prop('checked', info.event.allDay);
+
+        if (info.event.allDay) {
+          $('#edit_start, #edit_end').attr('type', 'date');
+          $('#edit_start').val(info.event.start ? info.event.start.toISOString().split('T')[0] : '');
+          $('#edit_end').val(info.event.end ? info.event.end.toISOString().split('T')[0] : '');
+        } else {
+          $('#edit_start, #edit_end').attr('type', 'datetime-local');
+          $('#edit_start').val(info.event.start ? info.event.start.toISOString().slice(0,16) : '');
+          $('#edit_end').val(info.event.end ? info.event.end.toISOString().slice(0,16) : '');
+        }
+        $('#edit_description').val(info.event.extendedProps.description || '');
+        $('#edit_color').val(info.event.backgroundColor || '#28a745');
+        $('#editEventModal').modal('show');
+      }
+    });
+
+    calendar.render();
+
+    // Função auxiliar para realizar a pesquisa
+    function performSearch(searchKeywords) {
+      if (searchKeywords.trim() === "") {
+        // Se o campo estiver vazio, remova todas as fontes de eventos
+        // e adicione a fonte original
+        calendar.getEventSources().forEach(function(source) {
+          source.remove();
+        });
+        calendar.addEventSource(fetchOriginalEvents);
+        calendar.refetchEvents();
+        return;
+      }
+
+      // Se há uma busca, remova todas as fontes para não duplicar
+      calendar.getEventSources().forEach(function(source) {
+        source.remove();
+      });
+
+      $.ajax({
+        method: 'GET',
+        url: `/events/search?title=${encodeURIComponent(searchKeywords)}`,
+        success: function(response) {
+          console.log("Resposta da busca:", response);
+          // Remove os eventos atuais (caso existam)
+          calendar.removeAllEvents();
+          if (response.length > 0) {
+            // Adiciona os eventos retornados da pesquisa como fonte única
+            calendar.addEventSource(response);
+            // Navega para a data do primeiro evento encontrado
+            calendar.gotoDate(response[0].start);
+          } else {
+            // Se não houver resultados, apenas limpa os eventos
+            calendar.removeAllEvents();
+          }
+        },
+        error: function(xhr) {
+          console.error('Erro ao buscar eventos:', xhr);
+        }
+      });
+    }
+
+    // Manipulador para clique no botão de busca
+    $('#searchButton').on('click', function() {
+      let searchKeywords = $('#searchInput').val().toLowerCase();
+      console.log("Clique no botão de busca. Palavra-chave:", searchKeywords);
+      performSearch(searchKeywords);
+    });
+
+    // Debounce para busca enquanto o usuário digita
+    let searchTimeout;
+    $('#searchInput').on('keyup', function() {
+      clearTimeout(searchTimeout);
+      let searchKeywords = $(this).val().toLowerCase();
+      console.log("Keyup: palavra-chave =", searchKeywords);
+      searchTimeout = setTimeout(function() {
+        performSearch(searchKeywords);
+      }, 300);
+    });
+  });
+});
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
