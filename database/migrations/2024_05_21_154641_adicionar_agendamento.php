@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('all_day')->default(false); // Adicionado diretamente aqui
             $table->text('description')->nullable();
             $table->string('color')->nullable();
+            $table->boolean('user_id')->default(0); // Adicionado diretamente aqui
             $table->timestamps();
         });
     }

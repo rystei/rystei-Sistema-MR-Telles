@@ -45,9 +45,6 @@
                 <a class="nav-link" href="#contato">Contato</a>
               </li>
               <li class="nav-item">
-              <a class="nav-link" href="{{ route('agendar_compromissos') }}">Compromissos</a>
-              </li>
-              <li class="nav-item">
               <a class="nav-link" href="{{ route('login') }}">Login</a>
               </li>
               <li class="nav-item">

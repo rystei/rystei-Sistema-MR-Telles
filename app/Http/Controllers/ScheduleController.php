@@ -7,6 +7,8 @@ use App\Http\Requests\StoreScheduleRequest;
 use App\Http\Requests\UpdateScheduleRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class ScheduleController extends Controller
 {
@@ -14,6 +16,11 @@ class ScheduleController extends Controller
     public function index()
     {
         return view('schedule.index');
+    }
+
+    public function consultationIndex()
+    {
+        return view('schedule.consultations');
     }
 
     // Criação de um evento
@@ -44,11 +51,11 @@ class ScheduleController extends Controller
                 'title' => $event->title,
                 'start' => $event->all_day ? Carbon::parse($event->start)->format('Y-m-d') : $event->start,
                 'end' => $event->all_day ? Carbon::parse($event->start)->addDay()->format('Y-m-d') : $event->end,
-                'allDay' => (bool) $event->all_day, // Garante que seja true/false
+                'allDay' => (bool) $event->all_day,
                 'description' => $event->description,
                 'color' => $event->color,
             ];
-        });               
+        });
     
         return response()->json($schedules);
     }
@@ -175,40 +182,99 @@ class ScheduleController extends Controller
     
 
     // Criação de um evento via requisição AJAX
+    public function availableSlots(Request $request)
+    {
+        $date = Carbon::parse($request->input('date'));
+        $booked = Schedule::whereDate('start', $date)
+            ->where('title', 'Consulta')
+            ->get()
+            ->map(fn($s) => Carbon::parse($s->start)->format('H:i'))
+            ->toArray();
+
+        $allSlots = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+        $available = array_diff($allSlots, $booked);
+
+        return response()->json([
+            'available' => array_values($available),
+            'booked' => $booked
+        ]);
+    }
+
+
+public function listUserConsultations(Request $request)
+    {
+        $consultations = Schedule::where('title', 'Consulta')
+            ->where('user_id', Auth::id())
+            ->orderBy('start', 'asc')
+            ->get();
+        return response()->json($consultations);
+    }
+    
+    // Método de criação de evento (incluindo regras específicas para consultas)
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'start' => 'nullable|date_format:Y-m-d H:i',
-            'end' => 'nullable|date_format:Y-m-d H:i|after_or_equal:start',
+            'title'       => 'required|string|max:255',
+            'start'       => 'required|date_format:Y-m-d H:i',
+            'end'         => 'required|date_format:Y-m-d H:i|after_or_equal:start',
             'description' => 'nullable|string',
-            'color' => 'nullable|string|max:7',
-            'all_day' => 'sometimes|boolean' // Usa 'sometimes' para evitar erro caso o campo não seja enviado
+            'color'       => 'nullable|string|max:7',
+            'all_day'     => 'sometimes|boolean',
         ]);
-        
-        $validated['all_day'] = $request->has('all_day') ? 1 : 0; // Converte checkbox para booleano (1 ou 0)
-        
-
-        // Se for evento de dia inteiro, definir a data sem horário
-        if ($request->has('all_day')) {
-            $validated['all_day'] = true;
-            $validated['start'] = date('Y-m-d', strtotime($validated['start'] ?? now()));
-            $validated['end'] = $validated['start']; // Evento de um único dia inteiro
-        } else {
-            $validated['all_day'] = false;
-        }
-
-        Schedule::create([
-            'title' => $validated['title'],
-            'start' => $validated['start'],
-            'end' => $validated['end'] ?? $validated['start'], 
-            'description' => $validated['description'] ?? null,
-            'color' => $validated['color'] ?? '#ff0000',
-            'all_day' => $validated['all_day']
-        ]);
-
-        return redirect()->route('agendar_compromissos')->with('status', 'Evento criado com sucesso!');
-    }
-
     
+        // Se for uma "Consulta", aplica as regras específicas
+        if ($validated['title'] === 'Consulta') {
+            $start = Carbon::createFromFormat('Y-m-d H:i', $validated['start']);
+    
+            // Validação: somente dias úteis
+            if ($start->isWeekend()) {
+                return response()->json(['error' => 'Consultas só podem ser marcadas de segunda a sexta.'], 422);
+            }
+    
+            // Validação: horário comercial
+            $hour = $start->hour;
+            $validMorning = ($hour >= 8 && $hour < 12);
+            $validAfternoon = ($hour >= 14 && $hour < 18);
+            if (!($validMorning || $validAfternoon)) {
+                return response()->json(['error' => 'Horários permitidos: 08:00-11:00 ou 14:00-17:00.'], 422);
+            }
+    
+            // Validação: sobreposição
+            $exists = Schedule::where('title', 'Consulta')
+                ->whereBetween('start', [$start, $start->copy()->addHour()])
+                ->orWhereBetween('end', [$start, $start->copy()->addHour()])
+                ->exists();
+    
+            if ($exists) {
+                return response()->json(['error' => 'Já existe uma consulta marcada nesse horário.'], 422);
+            }
+    
+            // Força os valores para consulta
+            $validated['title'] = 'Consulta';
+            $validated['color'] = '#000000';
+            $validated['all_day'] = false;
+            $validated['end'] = $start->copy()->addHour()->format('Y-m-d H:i');
+        }
+    
+        // Cria o evento no banco de dados
+        Schedule::create($validated);
+    
+        // Se a requisição não for AJAX, redireciona
+        if (!($request->ajax() || $request->wantsJson())) {
+            return redirect()->route('agendar_compromissos')
+                ->with('status', ($validated['title'] === 'Consulta')
+                    ? 'Consulta agendada com sucesso!'
+                    : 'Evento criado com sucesso!');
+        }
+    
+        // Caso contrário, retorna a resposta JSON
+        return response()->json([
+            'message' => ($validated['title'] === 'Consulta')
+                ? 'Consulta agendada com sucesso!'
+                : 'Evento criado com sucesso!'
+        ]);
+    }
+    
+
+
 }

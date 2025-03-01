@@ -3,26 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name', 'Laravel') }}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">MR TELLES</a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('controle_financeiro.index') }}">Controle Financeiro</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <title>@yield('title', 'MR TELLES')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <div class="container mt-4">
-        @yield('content')
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        /* Estilo do Sidebar */
+        .sidebar {
+            background: #343a40;
+            color: #fff;
+            min-height: 100vh;
+            position: fixed;
+            width: 250px;
+        }
+        .sidebar .nav-link {
+            color: #fff;
+        }
+        .sidebar .nav-link.active {
+            background-color: #495057;
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar de Navegação -->
+            <nav class="col-md-2 sidebar">
+                <div class="sidebar-sticky pt-3">
+                    <h4 class="text-center">Menu</h4>
+                    <ul class="nav flex-column">
+                    <li class="nav-item">
+              <a class="nav-link active" href="{{ route('dashboard') }}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('controle_financeiro.index') }}">Parcelas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('agendar_compromissos') }}">Eventos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('marcar_consulta') }}">Marcar consulta</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('financeiro') }}">Pagamento Pix</a>
+            </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('logout') }}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Sair
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Conteúdo Principal -->
+            <main role="main" class="col-md-9 ms-sm-auto col-lg-10 content">
+                @yield('content')
+            </main>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">    
+    @yield('scripts')
 </body>
 </html>
