@@ -184,16 +184,22 @@ class ScheduleController extends Controller
     // Criação de um evento via requisição AJAX
     public function availableSlots(Request $request)
     {
-        $date = Carbon::parse($request->input('date'));
-        $booked = Schedule::whereDate('start', $date)
+        $timezone = config('app.timezone'); // Ex: 'America/Sao_Paulo'
+        $date = Carbon::parse($request->input('date'))->setTimezone($timezone);
+    
+        $booked = Schedule::whereDate('start', $date->toDateString())
             ->where('title', 'Consulta')
             ->get()
-            ->map(fn($s) => Carbon::parse($s->start)->format('H:i'))
+            ->map(function ($s) use ($timezone) {
+                return Carbon::parse($s->start)
+                    ->setTimezone($timezone)
+                    ->format('H:i');
+            })
             ->toArray();
-
+    
         $allSlots = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
         $available = array_diff($allSlots, $booked);
-
+    
         return response()->json([
             'available' => array_values($available),
             'booked' => $booked
@@ -201,14 +207,13 @@ class ScheduleController extends Controller
     }
 
 
-public function listUserConsultations(Request $request)
+    // ScheduleController.php
+    public function listConsultationsByDate(Request $request)
     {
-        $consultations = Schedule::where('title', 'Consulta')
-            ->where('user_id', Auth::id())
-            ->orderBy('start', 'asc')
-            ->get();
+        $consultations = Schedule::where('title', 'Consulta')->get();
         return response()->json($consultations);
     }
+    
     
     // Método de criação de evento (incluindo regras específicas para consultas)
     public function store(Request $request)
@@ -224,7 +229,9 @@ public function listUserConsultations(Request $request)
     
         // Se for uma "Consulta", aplica as regras específicas
         if ($validated['title'] === 'Consulta') {
-            $start = Carbon::createFromFormat('Y-m-d H:i', $validated['start']);
+            $timezone = config('app.timezone'); // Pega o fuso do config/app.php
+            $start = Carbon::createFromFormat('Y-m-d H:i', $validated['start'], $timezone);
+            $end = Carbon::createFromFormat('Y-m-d H:i', $validated['end'], $timezone);
     
             // Validação: somente dias úteis
             if ($start->isWeekend()) {
@@ -239,14 +246,16 @@ public function listUserConsultations(Request $request)
                 return response()->json(['error' => 'Horários permitidos: 08:00-11:00 ou 14:00-17:00.'], 422);
             }
     
-            // Validação: sobreposição
+            // Validação de sobreposição CORRIGIDA
             $exists = Schedule::where('title', 'Consulta')
-                ->whereBetween('start', [$start, $start->copy()->addHour()])
-                ->orWhereBetween('end', [$start, $start->copy()->addHour()])
+                ->where(function ($query) use ($start, $end) {
+                    $query->where('start', '<', $end)
+                          ->where('end', '>', $start);
+                })
                 ->exists();
     
             if ($exists) {
-                return response()->json(['error' => 'Já existe uma consulta marcada nesse horário.'], 422);
+                return response()->json(['error' => 'Já existe uma consulta neste horário.'], 422);
             }
     
             // Força os valores para consulta

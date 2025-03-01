@@ -113,33 +113,36 @@ document.addEventListener("DOMContentLoaded", function() {
   // Função para carregar os horários disponíveis via AJAX
   async function loadAvailableTimes(date) {
     try {
-      timeSelect.innerHTML = '<option value="">Carregando horários...</option>';
-      // Utiliza a rota nomeada 'consultations.available' para obter os slots
-      const response = await fetch(`{{ route('consultations.available') }}?date=${date}`);
-      if (!response.ok) throw new Error('Erro ao carregar horários');
-      
-      const data = await response.json();
-      // "data.booked" deve ser um array de horários ocupados (ex: ["08:00", "10:00"])
-      const occupiedTimes = data.booked;
-      
-      timeSelect.innerHTML = '<option value="">Selecione um horário</option>';
-      businessHours.forEach(time => {
-        const option = document.createElement('option');
-        option.value = time;
-        if (occupiedTimes.includes(time)) {
-          option.textContent = `${time} - Indisponível`;
-          option.disabled = true;
-          option.style.color = "red";
-        } else {
-          option.textContent = time;
-        }
-        timeSelect.appendChild(option);
-      });
+        timeSelect.innerHTML = '<option value="">Carregando horários...</option>';
+        const response = await fetch(`{{ route('consultations.available') }}?date=${date}`);
+        if (!response.ok) throw new Error('Erro ao carregar horários');
+        
+        const data = await response.json();
+        const occupiedTimes = data.booked || [];
+        
+        timeSelect.innerHTML = '<option value="">Selecione um horário</option>';
+        
+        // Lista fixa de horários comerciais (com zeros à esquerda)
+        const businessHours = ['08:00', '09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00'];
+        
+        businessHours.forEach(time => {
+            const option = document.createElement('option');
+            option.value = time;
+            option.textContent = time;
+            
+            if (occupiedTimes.includes(time)) {
+                option.textContent += ' - Indisponível';
+                option.disabled = true;
+                option.style.color = 'red';
+            }
+            
+            timeSelect.appendChild(option);
+        });
     } catch (error) {
-      showError('Erro ao carregar horários disponíveis');
-      console.error(error);
+        showError('Erro ao carregar horários disponíveis');
+        console.error(error);
     }
-  }
+}
 
   // Função para carregar todas as consultas do usuário (sem filtrar pela data selecionada)
   async function loadConsultations() {

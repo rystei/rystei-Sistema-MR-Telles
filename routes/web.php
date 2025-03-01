@@ -54,14 +54,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 
-// Marcar consulta
-Route::get('/marcar_consulta', [ScheduleController::class, 'consultationIndex'])->name('marcar_consulta');
-Route::get('/consultations', [ScheduleController::class, 'getConsultations'])->name('consultations.get');
-Route::post('/consultations', [ScheduleController::class, 'store'])->name('consultations.store');
-Route::put('/consultations/{id}', [ScheduleController::class, 'updateEvent'])->name('consultations.update');
-Route::delete('/consultations/{id}', [ScheduleController::class, 'deleteEvent'])->name('consultations.delete');
-Route::get('/consultations/list', [ScheduleController::class, 'listConsultationsByDate'])->name('consultations.list'); // se necessário
-Route::get('/api/available-slots', [ScheduleController::class, 'availableSlots'])->name('consultations.available');
+        // Marcar consulta
+        Route::get('/marcar_consulta', [ScheduleController::class, 'consultationIndex'])->name('marcar_consulta');
+        Route::get('/consultations', [ScheduleController::class, 'listConsultationsByDate'])->name('consultations.get');
+        Route::post('/consultations', [ScheduleController::class, 'store'])->name('consultations.store');
+        Route::put('/consultations/{id}', [ScheduleController::class, 'updateEvent'])->name('consultations.update');
+        Route::delete('/consultations/{id}', [ScheduleController::class, 'deleteEvent'])->name('consultations.delete');
+        Route::get('/consultations/list', [ScheduleController::class, 'listConsultationsByDate'])->name('consultations.list'); // se necessário
+        Route::get('/api/available-slots', [ScheduleController::class, 'availableSlots'])->name('consultations.available');
 
 
 
