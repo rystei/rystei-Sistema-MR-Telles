@@ -210,7 +210,9 @@ class ScheduleController extends Controller
     // ScheduleController.php
     public function listConsultationsByDate(Request $request)
     {
-        $consultations = Schedule::where('title', 'Consulta')->get();
+        $consultations = Schedule::where('title', 'Consulta')
+        ->where('user_id', auth()->id())
+        ->get();
         return response()->json($consultations);
     }
     
@@ -229,6 +231,7 @@ class ScheduleController extends Controller
     
         // Se for uma "Consulta", aplica as regras específicas
         if ($validated['title'] === 'Consulta') {
+            $validated['user_id'] = auth()->id();
             $timezone = config('app.timezone'); // Pega o fuso do config/app.php
             $start = Carbon::createFromFormat('Y-m-d H:i', $validated['start'], $timezone);
             $end = Carbon::createFromFormat('Y-m-d H:i', $validated['end'], $timezone);
