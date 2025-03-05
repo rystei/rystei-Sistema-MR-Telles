@@ -58,6 +58,12 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ route('financeiro') }}">Pagamento Pix</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('processos.index') }}">Gerenciamento processos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('processos.meus') }}">Acompanhar processos</a>
+            </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('logout') }}"
                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

@@ -9,6 +9,7 @@ use App\Http\Controllers\PixWebhookController;
 use App\Http\Controllers\ControleFinanceiroController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\ProcessoController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,6 +27,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+
     // Rotas financeiras
     Route::get('/financeiro', function () {
         return view('financeiro.index');
@@ -40,7 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/{id}/atualizar-status', [ControleFinanceiroController::class, 'atualizarStatus'])->name('controle_financeiro.update_status');
     });
 
-
+        //Gerenciar eventos
         Route::get('/AgendarCompromissos', [ScheduleController::class, 'index'])->name('agendar_compromissos');
         Route::get('/events', [ScheduleController::class, 'getEvents']);
         Route::put('/events/update/{id}', [ScheduleController::class, 'updateEvent']);
@@ -62,6 +64,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/consultations/{id}', [ScheduleController::class, 'deleteEvent'])->name('consultations.delete');
         Route::get('/consultations/list', [ScheduleController::class, 'listConsultationsByDate'])->name('consultations.list'); // se necessário
         Route::get('/api/available-slots', [ScheduleController::class, 'availableSlots'])->name('consultations.available');
+
+        
+        // Listar todos os processos
+        Route::get('/processos', [ProcessoController::class, 'index'])->name('processos.index');
+        Route::post('/processos', [ProcessoController::class, 'store'])->name('processos.store');
+        Route::get('/meus-processos', [ProcessoController::class, 'meusProcessos'])->name('processos.meus');
 
 
 
