@@ -5,7 +5,26 @@
 <div class="container">
     <h2>Gerenciar Processos</h2>
 
-    <!-- Formulário de criação -->
+    <!-- Formulário de Pesquisa -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ route('processos.index') }}" class="row g-3">
+                <div class="col-md-5">
+                    <label for="cliente" class="form-label">Pesquisar por Cliente</label>
+                    <input type="text" name="cliente" id="cliente" class="form-control" placeholder="Nome do Cliente" value="{{ request('cliente') }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="numero_processo" class="form-label">Pesquisar por Nº do Processo</label>
+                    <input type="text" name="numero_processo" id="numero_processo" class="form-control" placeholder="Número do Processo" value="{{ request('numero_processo') }}">
+                </div>
+                <div class="col-md-2 align-self-end">
+                    <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Formulário de Criação -->
     <div class="card mb-4">
         <div class="card-body">
             <form action="{{ route('processos.store') }}" method="POST">
@@ -38,7 +57,7 @@
         </div>
     </div>
 
-    <!-- Lista de processos -->
+    <!-- Lista de Processos -->
     <div class="card">
         <div class="card-body">
             <table class="table table-hover">
@@ -52,7 +71,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($processos as $processo)
+                    @forelse($processos as $processo)
                         <tr>
                             <td>{{ $processo->numero_processo }}</td>
                             <td>{{ $processo->cliente->name }}</td>
@@ -71,9 +90,17 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                          <td colspan="5" class="text-center">Nenhum processo encontrado.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
+            <!-- Links de Paginação -->
+            <div class="d-flex justify-content-center">
+                {{ $processos->links() }}
+            </div>
         </div>
     </div>
 </div>
