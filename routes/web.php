@@ -70,6 +70,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/processos', [ProcessoController::class, 'index'])->name('processos.index');
         Route::post('/processos', [ProcessoController::class, 'store'])->name('processos.store');
         Route::get('/meus-processos', [ProcessoController::class, 'meusProcessos'])->name('processos.meus');
+        Route::get('/{processo}/status', [ProcessoController::class, 'editStatus'])->name('processos.editStatus');
+        Route::put('/{processo}/status', [ProcessoController::class, 'updateStatus'])->name('processos.updateStatus');
+        Route::delete('/processos/{processo}/historico/{index}', [ProcessoController::class, 'deleteHistorico'])->name('processos.deleteHistorico');
+        Route::delete('/processos/{processo}', [ProcessoController::class, 'destroy'])->name('processos.destroy');
+
 
 
 

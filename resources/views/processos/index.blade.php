@@ -1,4 +1,4 @@
-<!-- resources/views/processos/index.blade.php -->
+{{-- resources/views/processos/index.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
@@ -15,7 +15,7 @@
                         <label>Cliente</label>
                         <select name="user_id" class="form-select" required>
                             @foreach($clientes as $cliente)
-                            <option value="{{ $cliente->id }}">{{ $cliente->name }}</option>
+                                <option value="{{ $cliente->id }}">{{ $cliente->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -48,16 +48,29 @@
                         <th>Cliente</th>
                         <th>Descrição</th>
                         <th>Status</th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($processos as $processo)
-                    <tr>
-                        <td>{{ $processo->numero_processo }}</td>
-                        <td>{{ $processo->cliente->name }}</td>
-                        <td>{{ Str::limit($processo->descricao, 40) }}</td>
-                        <td>{{ ucfirst($processo->status_atual) }}</td>
-                    </tr>
+                        <tr>
+                            <td>{{ $processo->numero_processo }}</td>
+                            <td>{{ $processo->cliente->name }}</td>
+                            <td>{{ Str::limit($processo->descricao, 40) }}</td>
+                            <td>{{ ucfirst($processo->status_atual) }}</td>
+                            <td class="text-center">
+                                <a href="{{ route('processos.editStatus', $processo) }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-diagram-3"></i> Status
+                                </a>
+                                <form action="{{ route('processos.destroy', $processo) }}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esse processo?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Excluir
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
                     @endforeach
                 </tbody>
             </table>
