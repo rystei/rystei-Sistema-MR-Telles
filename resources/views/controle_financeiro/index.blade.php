@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+<div class="container">
     <h1 class="mb-4">Controle Financeiro</h1>
 
     @if (session('success'))
@@ -13,9 +14,9 @@
     <a href="{{ route('controle_financeiro.create') }}" class="btn btn-primary mb-4">Adicionar Nova Parcela</a>
 
     <table class="table table-striped">
-        <thead class="thead-dark">
+        <thead>
             <tr>
-                <th scope="col">Cliente</th>
+                <th scope="col">Usuário</th>
                 <th scope="col">Parcela</th>
                 <th scope="col">Valor</th>
                 <th scope="col">Data de Vencimento</th>
@@ -26,8 +27,8 @@
         <tbody>
             @foreach($parcelas as $parcela)
                 <tr>
-                    <td>{{ $parcela->cliente->nome }}</td>
-                    <td>{{ $parcela->parcela_numero }}</td>
+                    <td>{{ $parcela->user->name }}</td>
+                    <td>{{ $parcela->parcela_numero }}/{{ $parcela->total_parcelas }}</td>
                     <td>R$ {{ number_format($parcela->valor, 2, ',', '.') }}</td>
                     <td>{{ \Carbon\Carbon::parse($parcela->data_vencimento)->format('d/m/Y') }}</td>
                     <td>{{ ucfirst($parcela->status_pagamento) }}</td>
@@ -46,4 +47,5 @@
             @endforeach
         </tbody>
     </table>
+</div>
 @endsection

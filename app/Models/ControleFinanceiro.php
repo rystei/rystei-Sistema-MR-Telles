@@ -12,7 +12,7 @@ class ControleFinanceiro extends Model
     protected $table = 'controle_financeiro';
 
     protected $fillable = [
-        'cliente_id',
+        'user_id',
         'parcela_numero',
         'valor',
         'data_vencimento',
@@ -21,8 +21,8 @@ class ControleFinanceiro extends Model
         'notificado',
     ];
 
-    public function cliente()
+    public function user()
     {
-        return $this->belongsTo(Cliente::class, 'cliente_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('controle_financeiro', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cliente_id'); // Relacionamento com a tabela de clientes
+            $table->unsignedBigInteger('user_id'); // Relacionamento com a tabela de clientes
             $table->integer('parcela_numero'); // Número da parcela
             $table->decimal('valor', 10, 2); // Valor da parcela
             $table->date('data_vencimento'); // Data de vencimento da parcela

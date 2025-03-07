@@ -15,9 +15,7 @@
   <script src="{{ asset('pt-br.global.min.js') }}"></script>
 </head>
 <body>
-  <nav class="navbar navbar-light bg-light">
-    <a class="navbar-brand" href="#">MR TELLES</a>
-  </nav>
+
 
   <div class="container mt-5">
     <div class="row">

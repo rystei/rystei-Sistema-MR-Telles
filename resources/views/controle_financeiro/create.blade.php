@@ -6,10 +6,10 @@
     <form action="{{ route('controle_financeiro.store') }}" method="POST">
         @csrf
         <div class="mb-3">
-            <label for="cliente_id" class="form-label">Cliente</label>
-            <select name="cliente_id" id="cliente_id" class="form-select" required>
-                @foreach($clientes as $cliente)
-                    <option value="{{ $cliente->id }}">{{ $cliente->nome }}</option>
+            <label for="user_id" class="form-label">Usuário</label>
+            <select name="user_id" id="user_id" class="form-select" required>
+                @foreach($usuarios as $usuario)
+                    <option value="{{ $usuario->id }}">{{ $usuario->name }}</option>
                 @endforeach
             </select>
         </div>
