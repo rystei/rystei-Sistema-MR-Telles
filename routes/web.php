@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/{id}/atualizar-status', [ControleFinanceiroController::class, 'atualizarStatus'])->name('controle_financeiro.atualizarStatus');
         Route::delete('/{id}', [ControleFinanceiroController::class, 'destroy'])->name('controle_financeiro.destroy');
         Route::get('/search', [ControleFinanceiroController::class, 'search'])->name('controle_financeiro.search');
+        Route::get('/minhas-parcelas', [ControleFinanceiroController::class, 'minhasParcelas'])->name('controle_financeiro.minhas');
     });
 
         //Gerenciar eventos

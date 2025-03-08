@@ -6,6 +6,8 @@ use App\Models\ControleFinanceiro;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 
 class ControleFinanceiroController extends Controller
 {
@@ -94,4 +96,22 @@ class ControleFinanceiroController extends Controller
 
         return view('controle_financeiro.index', compact('clientes'));
     }
+
+    public function minhasParcelas(Request $request)
+{
+    $user = Auth::user();
+    
+    $parcelas = ControleFinanceiro::where('user_id', $user->id)
+        ->when($request->search, function($query) use ($request) {
+            $search = $request->search;
+            return $query->where(function($q) use ($search) {
+                $q->where('parcela_numero', 'LIKE', "%$search%")
+                  ->orWhere('data_vencimento', 'LIKE', "%$search%");
+            });
+        })
+        ->orderBy('data_vencimento')
+        ->get();
+
+    return view('controle_financeiro.minhas', compact('parcelas', 'user'));
+}
 }

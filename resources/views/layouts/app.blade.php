@@ -50,6 +50,9 @@
               <a class="nav-link" href="{{ route('controle_financeiro.index') }}">Parcelas</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="{{ route('controle_financeiro.minhas') }}">Minhas Parcelas</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="{{ route('agendar_compromissos') }}">Eventos</a>
             </li>
             <li class="nav-item">
