@@ -5,103 +5,93 @@ namespace App\Http\Controllers;
 use App\Models\ControleFinanceiro;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class ControleFinanceiroController extends Controller
 {
     public function index()
     {
-        $parcelas = ControleFinanceiro::with('user')->get();
-    
-        foreach ($parcelas as $parcela) {
-            $dataVencimento = Carbon::parse($parcela->data_vencimento);
-            $diasRestantes = $dataVencimento->diffInDays(now());
-    
-            // Calcula o total de parcelas do mesmo pagamento
-            $totalParcelas = ControleFinanceiro::where('user_id', $parcela->user_id)->count();
-    
-            // Adiciona o total de parcelas à instância da parcela
-            $parcela->total_parcelas = $totalParcelas; 
-    
-            if ($diasRestantes <= 7 && $parcela->status_pagamento == 'pendente') {
-                $this->enviarNotificacao($parcela->user, $parcela);
-            }
-        }
-    
-        return view('controle_financeiro.index', compact('parcelas'));
+        $clientes = User::with(['controleFinanceiro' => function ($query) {
+            $query->orderBy('data_vencimento');
+        }])->orderBy('name')->get();
+
+        return view('controle_financeiro.index', compact('clientes'));
     }
-    
 
     public function create()
     {
-        $usuarios = User::all(); // Renomeado para $usuarios, mas pode manter $clientes se preferir
+        $usuarios = User::all();
         return view('controle_financeiro.create', compact('usuarios'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'user_id'         => 'required|exists:users,id',
-            'parcela_numero'  => 'required|integer',
-            'valor'           => 'required|numeric',
-            'data_vencimento' => 'required|date',
+            'user_id' => 'required|exists:users,id',
+            'total_parcelas' => 'required|integer|min:1',
+            'valor' => 'required|numeric',
+            'dia_fixo' => 'nullable|integer|min:1|max:31',
+            'data_vencimento' => 'required_without:dia_fixo|date',
         ]);
 
-        ControleFinanceiro::create([
-            'user_id'         => $request->user_id,
-            'parcela_numero'  => $request->parcela_numero,
-            'valor'           => $request->valor,
-            'data_vencimento' => $request->data_vencimento,
-            'status_pagamento'=> 'pendente',
-        ]);
+        $valor = str_replace(['.', ','], ['', '.'], $request->valor);
+        $valor = (float) $valor;
+
+        if ($request->dia_fixo) {
+            $currentDate = Carbon::now();
+            $diaFixo = $request->dia_fixo;
+
+            if ($currentDate->day > $diaFixo) {
+                $dataVencimento = Carbon::create($currentDate->year, $currentDate->month, $diaFixo)->addMonth();
+            } else {
+                $dataVencimento = Carbon::create($currentDate->year, $currentDate->month, $diaFixo);
+            }
+        } else {
+            $dataVencimento = Carbon::parse($request->data_vencimento);
+        }
+
+        for ($i = 1; $i <= $request->total_parcelas; $i++) {
+            ControleFinanceiro::create([
+                'user_id' => $request->user_id,
+                'parcela_numero' => $i,
+                'valor' => $valor,
+                'data_vencimento' => $dataVencimento->copy()->addMonths($i - 1),
+                'status_pagamento' => 'pendente',
+            ]);
+        }
 
         return redirect()->route('controle_financeiro.index')
-                         ->with('success', 'Parcela adicionada com sucesso.');
+                         ->with('success', 'Parcelas criadas com sucesso.');
     }
 
     public function atualizarStatus(Request $request, $id)
     {
-        $parcela = ControleFinanceiro::find($id);
-        if (!$parcela) {
-            return redirect()->back()->with('erro', 'Parcela não encontrada.');
-        }
+        $parcela = ControleFinanceiro::findOrFail($id);
+        $parcela->update([
+            'status_pagamento' => 'pago',
+            'data_pagamento' => now()
+        ]);
 
-        $parcela->status_pagamento = 'pago';
-        $parcela->data_pagamento = now();
-        $parcela->save();
-
-        $user = $parcela->user;
-        $dadosEmail = [
-            'nome'          => $user->name,
-            'parcela'       => $parcela->parcela_numero,
-            'valor'         => $parcela->valor,
-            'data_pagamento'=> now()->format('d/m/Y H:i'),
-        ];
-
-        //Mail::send('emails.confirmacao_pagamento', $dadosEmail, function($message) use ($user) {
-          //  $message->to($user->email)
-            //        ->subject('Confirmação de Pagamento');
-      //      });
-
-        return redirect()->back()->with('sucesso', 'Pagamento confirmado com sucesso.');
+        return redirect()->back()->with('success', 'Pagamento confirmado com sucesso.');
     }
 
-    private function enviarNotificacao($user, $parcela)
+    public function destroy($id)
     {
-        $assunto = 'Lembrete de Vencimento de Parcela';
-        $dados = [
-            'nome'           => $user->name,
-            'parcela'        => $parcela->parcela_numero,
-            'valor'          => $parcela->valor,
-            'data_vencimento'=> $parcela->data_vencimento,
-        ];
+        $parcela = ControleFinanceiro::findOrFail($id);
+        $parcela->delete();
+        
+        return redirect()->back()->with('success', 'Parcela excluída com sucesso.');
+    }
 
-        // Mail::send('emails.vencimento_notificacao', $dados, function($message) use ($user, $assunto) {
-        //     $message->to($user->email)
-        //             ->subject($assunto);
-        // });
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $clientes = User::with('controleFinanceiro')
+            ->where('name', 'LIKE', "%$search%")
+            ->orderBy('name')
+            ->get();
 
+        return view('controle_financeiro.index', compact('clientes'));
     }
 }
-

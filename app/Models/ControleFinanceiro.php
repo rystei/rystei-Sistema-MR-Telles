@@ -21,8 +21,13 @@ class ControleFinanceiro extends Model
         'notificado',
     ];
 
+    protected $casts = [
+        'data_vencimento' => 'date',
+        'data_pagamento' => 'datetime',
+    ];
+
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 }

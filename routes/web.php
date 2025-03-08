@@ -39,7 +39,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [ControleFinanceiroController::class, 'index'])->name('controle_financeiro.index');
         Route::get('/create', [ControleFinanceiroController::class, 'create'])->name('controle_financeiro.create');
         Route::post('/', [ControleFinanceiroController::class, 'store'])->name('controle_financeiro.store');
-        Route::patch('/{id}/atualizar-status', [ControleFinanceiroController::class, 'atualizarStatus'])->name('controle_financeiro.update_status');
+        Route::patch('/{id}/atualizar-status', [ControleFinanceiroController::class, 'atualizarStatus'])->name('controle_financeiro.atualizarStatus');
+        Route::delete('/{id}', [ControleFinanceiroController::class, 'destroy'])->name('controle_financeiro.destroy');
+        Route::get('/search', [ControleFinanceiroController::class, 'search'])->name('controle_financeiro.search');
     });
 
         //Gerenciar eventos
