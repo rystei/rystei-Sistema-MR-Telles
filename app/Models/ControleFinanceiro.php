@@ -19,6 +19,7 @@ class ControleFinanceiro extends Model
         'status_pagamento',
         'data_pagamento',
         'notificado',
+        'lote',
     ];
 
     protected $casts = [

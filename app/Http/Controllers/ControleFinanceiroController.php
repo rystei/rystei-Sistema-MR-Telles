@@ -30,40 +30,80 @@ class ControleFinanceiroController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'total_parcelas' => 'required|integer|min:1',
-            'valor' => 'required|numeric',
-            'dia_fixo' => 'nullable|integer|min:1|max:31',
-            'data_vencimento' => 'required_without:dia_fixo|date',
+            'total_parcelas' => 'required|integer|min:1|max:360',
+            'valor' => 'required|numeric|min:0.01',
+            'mes_inicio' => 'required|date_format:Y-m'
         ]);
-
-        $valor = str_replace(['.', ','], ['', '.'], $request->valor);
-        $valor = (float) $valor;
-
-        if ($request->dia_fixo) {
-            $currentDate = Carbon::now();
-            $diaFixo = $request->dia_fixo;
-
-            if ($currentDate->day > $diaFixo) {
-                $dataVencimento = Carbon::create($currentDate->year, $currentDate->month, $diaFixo)->addMonth();
-            } else {
-                $dataVencimento = Carbon::create($currentDate->year, $currentDate->month, $diaFixo);
+    
+        try {
+            // Converter valor
+            $valor = (float) str_replace(['.', ','], ['', '.'], $request->valor);
+            
+            // Gerar lote
+            $loteId = Carbon::now()->format('YmdHis');
+    
+            // Determinar data base
+            $dataBase = $this->calcularDecimoDiaUtil(Carbon::createFromFormat('Y-m', $request->mes_inicio));
+    
+            // Criar parcelas
+            $parcelas = [];
+            for ($i = 0; $i < $request->total_parcelas; $i++) {
+                $dataVencimento = $this->calcularDecimoDiaUtil($dataBase->copy()->addMonths($i));
+    
+                $parcelas[] = [
+                    'lote' => $loteId,
+                    'user_id' => $request->user_id,
+                    'parcela_numero' => $i + 1,
+                    'valor' => $valor,
+                    'data_vencimento' => $dataVencimento->toDateString(),
+                    'status_pagamento' => 'pendente',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
-        } else {
-            $dataVencimento = Carbon::parse($request->data_vencimento);
+    
+            ControleFinanceiro::insert($parcelas);
+    
+            return redirect()->route('controle_financeiro.index')
+                            ->with('success', 'Parcelas criadas com sucesso!');
+    
+        } catch (\Exception $e) {
+            \Log::error('Erro ao criar parcelas: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => 'Erro ao criar parcelas: ' . $e->getMessage()]);
         }
-
-        for ($i = 1; $i <= $request->total_parcelas; $i++) {
-            ControleFinanceiro::create([
-                'user_id' => $request->user_id,
-                'parcela_numero' => $i,
-                'valor' => $valor,
-                'data_vencimento' => $dataVencimento->copy()->addMonths($i - 1),
-                'status_pagamento' => 'pendente',
-            ]);
+    }
+    
+    private function calcularDecimoDiaUtil(Carbon $data)
+    {
+        $data = $data->copy()->startOfMonth();
+        $contadorDiasUteis = 0;
+    
+        while ($contadorDiasUteis < 10) {
+            if (!$data->isWeekend()) {
+                $contadorDiasUteis++;
+            }
+            if ($contadorDiasUteis < 10) {
+                $data->addDay();
+            }
         }
-
-        return redirect()->route('controle_financeiro.index')
-                         ->with('success', 'Parcelas criadas com sucesso.');
+    
+        return $data;
+    }
+    // Métodos auxiliares
+    private function ajustarParaDiaUtil(Carbon $data): Carbon
+    {
+        while ($data->isWeekend()) {
+            $data->addDay();
+        }
+        return $data;
+    }
+    
+    private function ajustarUltimoDiaMes(Carbon $data, ?int $diaOriginal): Carbon
+    {
+        if ($diaOriginal && $data->day !== $diaOriginal) {
+            return $data->endOfMonth();
+        }
+        return $data;
     }
 
     public function atualizarStatus(Request $request, $id)

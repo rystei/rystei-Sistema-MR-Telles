@@ -4,7 +4,11 @@
 <div class="container">
     <h1 class="mb-4">Controle Financeiro</h1>
 
-
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
     <!-- Filtro de Pesquisa -->
     <div class="card mb-4">
@@ -31,65 +35,71 @@
                     <h5>{{ $cliente->name }}</h5>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <strong>Total:</strong> {{ $cliente->controleFinanceiro->count() }}
-                        </div>
-                        <div class="col-md-4">
-                            <strong>Pagas:</strong> {{ $cliente->controleFinanceiro->where('status_pagamento', 'pago')->count() }}
-                        </div>
-                        <div class="col-md-4">
-                            <strong>Pendentes:</strong> {{ $cliente->controleFinanceiro->where('status_pagamento', 'pendente')->count() }}
-                        </div>
-                    </div>
+                    @foreach($cliente->controleFinanceiro->groupBy('lote') as $lote => $parcelas)
+                        <div class="lote-group mb-4 border-bottom pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6>
+        Lote: 
+        @if(strlen($lote) >= 14)
+            {{ \Carbon\Carbon::createFromFormat('YmdHis', $lote)->format('d/m/Y H:i') }}
+        @else
+            #{{ $lote }} (Criado em: {{ $parcelas->first()->created_at->format('d/m/Y') }})
+        @endif
+    </h6>
+    <span class="badge bg-primary">
+        {{ count($parcelas) }} Parcela(s)
+    </span>
+</div>
 
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Parcela</th>
-                                <th>Vencimento</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($cliente->controleFinanceiro->sortBy('data_vencimento') as $parcela)
-                                <tr>
-                                    <td>{{ $parcela->parcela_numero }}/{{ $cliente->controleFinanceiro->count() }}</td>
-                                    <td>{{ $parcela->data_vencimento->format('d/m/Y') }}</td>
-                                    <td>R$ {{ number_format($parcela->valor, 2, ',', '.') }}</td>
-                                    <td>
-                                        <span class="badge {{ $parcela->status_pagamento == 'pago' ? 'bg-success' : 'bg-warning' }}">
-                                            {{ ucfirst($parcela->status_pagamento) }}
-                                        </span>
-                                    </td>
-                                    <td class="d-flex gap-2">
-                                        @if ($parcela->status_pagamento == 'pendente')
-                                            <form action="{{ route('controle_financeiro.atualizarStatus', $parcela->id) }}" method="POST">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="btn btn-sm btn-success">Pagar</button>
-                                            </form>
-                                        @else
-                                            <small class="text-muted">
-                                                {{ $parcela->data_pagamento->format('d/m/Y H:i') }}
-                                            </small>
-                                        @endif
-                                        
-                                        <form action="{{ route('controle_financeiro.destroy', $parcela->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger" 
-                                                    onclick="return confirm('Tem certeza que deseja excluir esta parcela?')">
-                                                Excluir
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Parcela</th>
+                                        <th>Vencimento</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($parcelas->sortBy('data_vencimento') as $parcela)
+                                        <tr>
+                                            <td>{{ $parcela->parcela_numero }}</td>
+                                            <td>{{ $parcela->data_vencimento->format('d/m/Y') }}</td>
+                                            <td>R$ {{ number_format($parcela->valor, 2, ',', '.') }}</td>
+                                            <td>
+                                                <span class="badge {{ $parcela->status_pagamento == 'pago' ? 'bg-success' : 'bg-warning' }}">
+                                                    {{ ucfirst($parcela->status_pagamento) }}
+                                                </span>
+                                            </td>
+                                            <td class="d-flex gap-2">
+                                                @if ($parcela->status_pagamento == 'pendente')
+                                                    <form action="{{ route('controle_financeiro.atualizarStatus', $parcela->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="btn btn-sm btn-success">Pagar</button>
+                                                    </form>
+                                                @else
+                                                    <small class="text-muted">
+                                                        {{ $parcela->data_pagamento->format('d/m/Y H:i') }}
+                                                    </small>
+                                                @endif
+                                                
+                                                <form action="{{ route('controle_financeiro.destroy', $parcela->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" 
+                                                            onclick="return confirm('Tem certeza que deseja excluir esta parcela?')">
+                                                        Excluir
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         @endif
