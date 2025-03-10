@@ -42,6 +42,13 @@
                    value="{{ old('valor') }}" 
                    required>
         </div>
+        <div class="mb-3">
+            <label class="form-label">Descrição da Parcela</label>
+            <input type="text" name="descricao" class="form-control" 
+                placeholder="Ex: Honorários, Taxa Administrativa" 
+                value="{{ old('descricao') }}" 
+                required>
+        </div>
 
         <div class="mb-3">
             <label class="form-label">Mês de Início (décimo dia útil do mês)</label>

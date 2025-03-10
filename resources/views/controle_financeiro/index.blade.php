@@ -37,24 +37,27 @@
                 <div class="card-body">
                     @foreach($cliente->controleFinanceiro->groupBy('lote') as $lote => $parcelas)
                         <div class="lote-group mb-4 border-bottom pb-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-    <h6>
-        Lote: 
-        @if(strlen($lote) >= 14)
-            {{ \Carbon\Carbon::createFromFormat('YmdHis', $lote)->format('d/m/Y H:i') }}
-        @else
-            #{{ $lote }} (Criado em: {{ $parcelas->first()->created_at->format('d/m/Y') }})
-        @endif
-    </h6>
-    <span class="badge bg-primary">
-        {{ count($parcelas) }} Parcela(s)
-    </span>
-</div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6>
+                                        Criado: 
+                                        @if(strlen($lote) >= 14)
+                                            {{ \Carbon\Carbon::createFromFormat('YmdHis', $lote)->format('d/m/Y H:i') }}
+                                        @else
+                                            #{{ $lote }} (Criado em: {{ $parcelas->first()->created_at->format('d/m/Y') }})
+                                        @endif
+                                    </h6>
+                                </div>
+                                <span class="badge bg-primary">
+                                    {{ count($parcelas) }} Parcela(s)
+                                </span>
+                            </div>
 
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th>Parcela</th>
+                                        <th>Descrição</th>
                                         <th>Vencimento</th>
                                         <th>Valor</th>
                                         <th>Status</th>
@@ -65,6 +68,7 @@
                                     @foreach ($parcelas->sortBy('data_vencimento') as $parcela)
                                         <tr>
                                             <td>{{ $parcela->parcela_numero }}</td>
+                                            <td>{{ $parcela->descricao }}</td>
                                             <td>{{ $parcela->data_vencimento->format('d/m/Y') }}</td>
                                             <td>R$ {{ number_format($parcela->valor, 2, ',', '.') }}</td>
                                             <td>
@@ -81,10 +85,10 @@
                                                     </form>
                                                 @else
                                                     <small class="text-muted">
-                                                        {{ $parcela->data_pagamento->format('d/m/Y H:i') }}
+                                                        {{ $parcela->data_pagamento->format('d/m/Y') }}
                                                     </small>
                                                 @endif
-                                                
+
                                                 <form action="{{ route('controle_financeiro.destroy', $parcela->id) }}" method="POST">
                                                     @csrf
                                                     @method('DELETE')

@@ -56,6 +56,7 @@ class ControleFinanceiroController extends Controller
                     'parcela_numero' => $i + 1,
                     'valor' => $valor,
                     'data_vencimento' => $dataVencimento->toDateString(),
+                    'descricao' => $request->descricao,
                     'status_pagamento' => 'pendente',
                     'created_at' => now(),
                     'updated_at' => now(),
