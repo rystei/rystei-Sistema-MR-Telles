@@ -28,9 +28,6 @@
                     </div>
                     
                     @if($parcela->status_pagamento == 'pago')
-                        <div class="mt-2 text-muted">
-                            <small>Pago em: {{ $parcela->data_pagamento->format('d/m/Y') }}</small>
-                        </div>
                     @endif
                 </div>
             @empty

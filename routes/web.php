@@ -11,6 +11,7 @@ use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\ProcessoController;
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -28,12 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
-    // Rotas financeiras
-    Route::get('/financeiro', function () {
-        return view('financeiro.index');
-    })->name('financeiro');
-    
-    Route::post('/financeiro/calculate', [GerenciarRecursosFinanceiro::class, 'calculate']);
+    Route::get('/financeiro', [GerenciarRecursosFinanceiro::class, 'index'])->name('financeiro');
+    Route::post('/financeiro/calcular', [GerenciarRecursosFinanceiro::class, 'calculate'])->name('financeiro.calculate');
     
     Route::prefix('controle-financeiro')->group(function () {
         Route::get('/', [ControleFinanceiroController::class, 'index'])->name('controle_financeiro.index');
