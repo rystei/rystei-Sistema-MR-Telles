@@ -18,7 +18,6 @@ return new class extends Migration
             $table->date('data_vencimento'); // Data de vencimento da parcela
             $table->enum('status_pagamento', ['pendente', 'pago', 'atrasado'])->default('pendente'); // Status do pagamento
             $table->date('data_pagamento')->nullable(); // Data de pagamento (caso a parcela tenha sido paga)
-            $table->boolean('notificado')->default(false); // Flag para notificação
             $table->timestamps();
 
             // Chave estrangeira para a tabela de usuários

@@ -40,6 +40,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/{id}', [ControleFinanceiroController::class, 'destroy'])->name('controle_financeiro.destroy');
         Route::get('/search', [ControleFinanceiroController::class, 'search'])->name('controle_financeiro.search');
         Route::get('/minhas-parcelas', [ControleFinanceiroController::class, 'minhasParcelas'])->name('controle_financeiro.minhas');
+        //pagamento pix parcelas
+        Route::get('/pagamento', [ControleFinanceiroController::class, 'pagamento'])->name('pagamento');
+        Route::post('/gerar-pix/{parcela}', [ControleFinanceiroController::class, 'gerarPix'])->name('gerar-pix');
     });
 
         //Gerenciar eventos

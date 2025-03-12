@@ -155,4 +155,103 @@ class ControleFinanceiroController extends Controller
 
     return view('controle_financeiro.minhas', compact('parcelas', 'user'));
 }
+
+// Método para exibir a view de pagamento
+public function pagamento()
+{
+    $user = Auth::user();
+    $now = Carbon::now();
+    
+    $parcelas = ControleFinanceiro::where('user_id', $user->id)
+        ->whereMonth('data_vencimento', $now->month)
+        ->whereYear('data_vencimento', $now->year)
+        ->where('status_pagamento', 'pendente')
+        ->orderBy('data_vencimento')
+        ->get();
+
+    return view('controle_financeiro.pagamento', compact('parcelas'));
+}
+
+// Método para gerar o QR Code PIX
+public function gerarPix(ControleFinanceiro $parcela)
+{
+    // Verifica se a parcela pertence ao usuário logado
+    if ($parcela->user_id !== Auth::id()) {
+        abort(403, 'Acesso não autorizado');
+    }
+
+    // Gera o payload PIX
+    $pixPayload = $this->generatePixPayload($parcela->valor);
+
+    // Gera o QR Code
+    $renderer = new \BaconQrCode\Renderer\Image\SvgImageBackEnd();
+    $renderer = new \BaconQrCode\Renderer\ImageRenderer(
+        new \BaconQrCode\Renderer\RendererStyle\RendererStyle(400),
+        $renderer
+    );
+    
+    $qrCode = (new \BaconQrCode\Writer($renderer))->writeString($pixPayload);
+
+    return view('controle_financeiro.pagamento', [
+        'parcelas' => $this->pagamento()->parcelas,
+        'qrCode' => $qrCode,
+        'valorParcela' => $parcela->valor
+    ]);
+}
+
+private function generatePixPayload($amount)
+{
+    $pixKey = env('PIX_KEY');
+    $merchantName = substr(env('MERCHANT_NAME'), 0, 25);
+    $merchantCity = substr(env('MERCHANT_CITY'), 0, 15);
+    $formattedAmount = number_format($amount, 2, '.', '');
+
+    // Construção do payload seguindo padrão oficial
+    $payload = "000201" // Payload inicial
+        . "26" // Merchant Account Information
+        . $this->buildMerchantAccountInfo($pixKey)
+        . "52040000" // Merchant Category Code
+        . "5303986" // Moeda (BRL)
+        . "54" . str_pad(strlen($formattedAmount), 2, '0', STR_PAD_LEFT) . $formattedAmount
+        . "5802BR" // País
+        . "59" . str_pad(strlen($merchantName), 2, '0', STR_PAD_LEFT) . $merchantName
+        . "60" . str_pad(strlen($merchantCity), 2, '0', STR_PAD_LEFT) . $merchantCity
+        . "62070503***" // Additional Data Field
+        . "6304"; // CRC16 placeholder
+
+    $crc = $this->calculateCRC16($payload);
+    return $payload . $crc;
+}
+
+// Métodos auxiliares (já existentes)
+private function buildMerchantAccountInfo($pixKey)
+{
+    $gui = "0014BR.GOV.BCB.PIX"; // GUI fixo
+    $pixKeyType = "01"; // Tipo de chave (01 = chave aleatória)
+    $pixKeyLength = str_pad(strlen($pixKey), 2, '0', STR_PAD_LEFT);
+    
+    $merchantInfo = $gui . $pixKeyType . $pixKeyLength . $pixKey;
+    $merchantInfoLength = str_pad(strlen($merchantInfo), 2, '0', STR_PAD_LEFT);
+    
+    return $merchantInfoLength . $merchantInfo;
+}
+
+private function calculateCRC16($payload)
+{
+    $polynomial = 0x1021;
+    $result = 0xFFFF;
+
+    // Otimização para grandes payloads
+    for ($offset = 0; $offset < strlen($payload); $offset++) {
+        $result ^= ord($payload[$offset]) << 8;
+        for ($bit = 0; $bit < 8; $bit++) {
+            $result = ($result & 0x8000) 
+                ? (($result << 1) ^ $polynomial) 
+                : ($result << 1);
+            $result &= 0xFFFF;
+        }
+    }
+    
+    return strtoupper(str_pad(dechex($result), 4, '0', STR_PAD_LEFT));
+}
 }

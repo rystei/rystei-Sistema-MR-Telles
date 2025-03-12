@@ -18,7 +18,6 @@ class ControleFinanceiro extends Model
         'data_vencimento',
         'status_pagamento',
         'data_pagamento',
-        'notificado',
         'lote',
     ];
 

@@ -59,7 +59,10 @@
               <a class="nav-link" href="{{ route('marcar_consulta') }}">Marcar consulta</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ route('financeiro') }}">Pagamento Pix</a>
+              <a class="nav-link" href="{{ route('financeiro') }}">Pix calculo</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('pagamento') }}">Pagamento</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ route('processos.index') }}">Gerenciamento processos</a>
