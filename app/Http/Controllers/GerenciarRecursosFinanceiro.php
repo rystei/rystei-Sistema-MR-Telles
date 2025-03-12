@@ -17,19 +17,21 @@ class GerenciarRecursosFinanceiro extends Controller
 
     public function calculate(Request $request)
     {
-        $request->validate([
+        // Validação direta dos campos recebidos
+        $validated = $request->validate([
             'total_amount' => 'required|numeric|min:0.01',
             'percentage' => 'required|numeric|min:0.01|max:100',
             'installments' => 'required|integer|min:1'
         ]);
 
         try {
-            $chargeAmount = ($request->percentage / 100) * $request->total_amount;
+            // Cálculo direto com os valores recebidos
+            $chargeAmount = ($validated['percentage'] / 100) * $validated['total_amount'];
             
-            // Gera payload Pix
+            // Geração do payload PIX
             $pixPayload = $this->generatePixPayload($chargeAmount);
             
-            // Gera QR Code em SVG
+            // Geração do QR Code
             $renderer = new ImageRenderer(
                 new RendererStyle(400),
                 new SvgImageBackEnd()
@@ -39,13 +41,17 @@ class GerenciarRecursosFinanceiro extends Controller
 
             return view('financeiro.index', [
                 'qrCode' => $qrCode,
-                'chargeAmount' => $chargeAmount
+                'chargeAmount' => $chargeAmount,
+                'pixPayload' => $pixPayload,
+                'oldInput' => $request->all()
             ]);
 
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Erro: ' . $e->getMessage()]);
         }
     }
+
+    // Métodos removidos: cleanCurrency() e cleanPercentage()
 
     private function generatePixPayload($amount)
     {
@@ -54,27 +60,25 @@ class GerenciarRecursosFinanceiro extends Controller
         $merchantCity = substr(env('MERCHANT_CITY'), 0, 15);
         $formattedAmount = number_format($amount, 2, '.', '');
 
-        // Construção do payload
-        $payload = "000201" // Início do payload
-            . "26" // Merchant Account Information
+        $payload = "000201"
+            . "26"
             . $this->buildMerchantAccountInfo($pixKey)
-            . "52040000" // Merchant Category Code (0000)
-            . "5303986" // Moeda (BRL)
+            . "52040000"
+            . "5303986"
             . "54" . str_pad(strlen($formattedAmount), 2, '0', STR_PAD_LEFT) . $formattedAmount
-            . "5802BR" // País
+            . "5802BR"
             . "59" . str_pad(strlen($merchantName), 2, '0', STR_PAD_LEFT) . $merchantName
             . "60" . str_pad(strlen($merchantCity), 2, '0', STR_PAD_LEFT) . $merchantCity
-            . "62070503***" // Campo adicional
-            . "6304"; // CRC16 placeholder
+            . "62070503***"
+            . "6304";
 
-        // Calcula e adiciona CRC16
         $crc = $this->calculateCRC16($payload);
         return $payload . $crc;
     }
 
     private function buildMerchantAccountInfo($pixKey)
     {
-        $gui = "0014BR.GOV.BCB.PIX"; // GUI fixo para PIX
+        $gui = "0014BR.GOV.BCB.PIX";
         $key = "01" . str_pad(strlen($pixKey), 2, '0', STR_PAD_LEFT) . $pixKey;
         $merchantInfo = $gui . $key;
         return str_pad(strlen($merchantInfo), 2, '0', STR_PAD_LEFT) . $merchantInfo;
@@ -88,11 +92,7 @@ class GerenciarRecursosFinanceiro extends Controller
         for ($offset = 0; $offset < strlen($payload); $offset++) {
             $result ^= ord($payload[$offset]) << 8;
             for ($bit = 0; $bit < 8; $bit++) {
-                if ($result & 0x8000) {
-                    $result = ($result << 1) ^ $polynomial;
-                } else {
-                    $result <<= 1;
-                }
+                $result = ($result & 0x8000) ? (($result << 1) ^ $polynomial) : ($result << 1);
                 $result &= 0xFFFF;
             }
         }
