@@ -10,6 +10,7 @@ use App\Http\Controllers\ControleFinanceiroController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\ProcessoController;
+use App\Http\Middleware\IsAdmin;
 
 
 Route::get('/', function () {
@@ -29,11 +30,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
 
-    Route::get('/financeiro', [GerenciarRecursosFinanceiro::class, 'index'])->name('financeiro');
+    Route::get('/financeiro', [GerenciarRecursosFinanceiro::class, 'index'])->name('financeiro')->middleware(IsAdmin::class);
     Route::post('/financeiro/calcular', [GerenciarRecursosFinanceiro::class, 'calculate'])->name('financeiro.calculate');
     
     Route::prefix('controle-financeiro')->group(function () {
-        Route::get('/', [ControleFinanceiroController::class, 'index'])->name('controle_financeiro.index');
+        Route::get('/', [ControleFinanceiroController::class, 'index'])->name('controle_financeiro.index')->middleware(IsAdmin::class);;
         Route::get('/create', [ControleFinanceiroController::class, 'create'])->name('controle_financeiro.create');
         Route::post('/', [ControleFinanceiroController::class, 'store'])->name('controle_financeiro.store');
         Route::patch('/{id}/atualizar-status', [ControleFinanceiroController::class, 'atualizarStatus'])->name('controle_financeiro.atualizarStatus');
@@ -46,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
         //Gerenciar eventos
-        Route::get('/AgendarCompromissos', [ScheduleController::class, 'index'])->name('agendar_compromissos');
+        Route::get('/AgendarCompromissos', [ScheduleController::class, 'index'])->name('agendar_compromissos')->middleware(IsAdmin::class);;
         Route::get('/events', [ScheduleController::class, 'getEvents']);
         Route::put('/events/update/{id}', [ScheduleController::class, 'updateEvent']);
         Route::delete('/events/delete/{id}', [ScheduleController::class, 'deleteEvent']);
@@ -70,7 +71,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         
         // Listar todos os processos
-        Route::get('/processos', [ProcessoController::class, 'index'])->name('processos.index');
+        Route::get('/processos', [ProcessoController::class, 'index'])->name('processos.index')->middleware(IsAdmin::class);;
         Route::post('/processos', [ProcessoController::class, 'store'])->name('processos.store');
         Route::get('/meus-processos', [ProcessoController::class, 'meusProcessos'])->name('processos.meus');
         Route::get('/meus-processos/{processo}', [ProcessoController::class, 'meusProcessosDetalhes'])->name('processos.meusDetalhes');

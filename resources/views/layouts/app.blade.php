@@ -36,7 +36,7 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
+<div class="container-fluid">
         <div class="row">
             <!-- Sidebar de Navegação -->
             <nav class="col-md-2 sidebar">
@@ -46,27 +46,35 @@
                     <li class="nav-item">
               <a class="nav-link active" href="{{ route('dashboard') }}">Dashboard</a>
             </li>
+            @unless (!request()->user()->is_admin)
             <li class="nav-item">
               <a class="nav-link" href="{{ route('controle_financeiro.index') }}">Parcelas</a>
             </li>
+            @endunless
             <li class="nav-item">
               <a class="nav-link" href="{{ route('controle_financeiro.minhas') }}">Minhas Parcelas</a>
             </li>
+            @unless (!request()->user()->is_admin)
             <li class="nav-item">
               <a class="nav-link" href="{{ route('agendar_compromissos') }}">Eventos</a>
             </li>
+            @endunless
             <li class="nav-item">
               <a class="nav-link" href="{{ route('marcar_consulta') }}">Marcar consulta</a>
             </li>
+            @unless (!request()->user()->is_admin)
             <li class="nav-item">
               <a class="nav-link" href="{{ route('financeiro') }}">Pix calculo</a>
             </li>
+            @endunless
             <li class="nav-item">
               <a class="nav-link" href="{{ route('pagamento') }}">Pagamento</a>
             </li>
+            @unless (!request()->user()->is_admin)
             <li class="nav-item">
               <a class="nav-link" href="{{ route('processos.index') }}">Gerenciamento processos</a>
             </li>
+            @endunless
             <li class="nav-item">
               <a class="nav-link" href="{{ route('processos.meus') }}">Acompanhar processos</a>
             </li>
