@@ -2,76 +2,160 @@
 
 @section('content')
 <div class="container">
-  <h2 class="text-center mb-4">Marcar Consulta</h2>
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Agendamento de Consultas</h2>
+        <div class="badge bg-primary rounded-pill px-3 py-2">
+            <i class="fas fa-calendar-check me-2"></i>Agendamento
+        </div>
+    </div>
 
-  <!-- Formulário para agendar consulta -->
-  <div class="form-container">
-    <form id="consultationForm" action="{{ route('consultations.store') }}" method="POST">
-      @csrf
-      <!-- Campos fixos para consultas -->
-      <input type="hidden" name="title" value="Consulta">
-      <input type="hidden" name="color" value="#000000">
-      <input type="hidden" name="all_day" value="0">
-      
-      <div class="mb-3">
-        <label for="date" class="form-label">Escolha uma data:</label>
-        <!-- Esse campo não envia diretamente o start; o JS combinará a data com o horário -->
-        <input type="text" id="date" class="form-control" placeholder="Selecione a data" required>
-        <div class="error-message" id="dateError"></div>
-      </div>
-      
-      <div class="mb-3">
-        <label for="time" class="form-label">Escolha um horário:</label>
-        <select id="time" class="form-control" required>
-          <option value="">Carregando horários...</option>
-          <option value="08:00">08:00</option>
-          <option value="09:00">09:00</option>
-          <option value="10:00">10:00</option>
-          <option value="11:00">11:00</option>
-          <option value="14:00">14:00</option>
-          <option value="15:00">15:00</option>
-          <option value="16:00">16:00</option>
-          <option value="17:00">17:00</option>
-        </select>
-        <div class="error-message" id="timeError"></div>
-      </div>
-      
-      <div class="mb-3">
-        <label for="consultation_type" class="form-label">Tipo de Consulta:</label>
-        <select id="consultation_type" name="description" class="form-control" required>
-          <option value="">Selecione</option>
-          <option value="Direito Civil">Direito Civil</option>
-          <option value="Direito Previdenciário">Direito Previdenciário</option>
-          <option value="Direito Família">Direito Família</option>
-          <option value="Direito Trabalhista">Direito Trabalhista</option>
-          <option value="Outros">Outros</option>
-        </select>
-        <div class="error-message" id="typeError"></div>
-      </div>
-      
-      <button type="submit" class="btn btn-success w-100">Agendar Consulta</button>
-    </form>
-  </div>
+    <!-- Formulário -->
+    <div class="card border-0 shadow-lg mb-4">
+        <div class="card-body p-4">
+            <form id="consultationForm" action="{{ route('consultations.store') }}" method="POST">
+                @csrf
+                <div class="row g-4">
+                    <!-- Campos ocultos -->
+                    <input type="hidden" name="title" value="Consulta">
+                    <input type="hidden" name="color" value="#000000">
+                    <input type="hidden" name="all_day" value="0">
 
-  <!-- Tabela para exibir as consultas marcadas -->
-  <div class="card p-4 shadow-sm">
-    <h4 class="mb-3">Suas Consultas Marcadas</h4>
-    <table class="table table-bordered">
-      <thead class="table-light">
-        <tr>
-          <th>Data</th>
-          <th>Horário</th>
-          <th>Tipo de Consulta</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody id="consultationsTableBody">
-        <!-- Dados serão carregados via JavaScript -->
-      </tbody>
-    </table>
-  </div>
+                    <!-- Data -->
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-calendar-day text-primary fs-5"></i>
+                            <div class="w-100">
+                                <label class="text-muted small mb-1">Data da Consulta</label>
+                                <input type="text" id="date" class="form-control" placeholder="Selecione a data" required>
+                                <div class="error-message text-danger small mt-1" id="dateError"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Horário -->
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-clock text-primary fs-5"></i>
+                            <div class="w-100">
+                                <label class="text-muted small mb-1">Horário</label>
+                                <select id="time" class="form-select" required>
+                                    <option value="">Carregando...</option>
+                                </select>
+                                <div class="error-message text-danger small mt-1" id="timeError"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tipo -->
+                    <div class="col-md-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="fas fa-scale-balanced text-primary fs-5"></i>
+                            <div class="w-100">
+                                <label class="text-muted small mb-1">Tipo de Consulta</label>
+                                <select id="consultation_type" name="description" class="form-select" required>
+                                    <option value="">Selecione</option>
+                                    <option value="Direito Civil">Direito Civil</option>
+                                    <option value="Direito Previdenciário">Direito Previdenciário</option>
+                                    <option value="Direito Família">Direito Família</option>
+                                    <option value="Direito Trabalhista">Direito Trabalhista</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                                <div class="error-message text-danger small mt-1" id="typeError"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão -->
+                    <div class="col-md-2 align-self-end">
+                        <button type="submit" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-calendar-plus me-2"></i>Agendar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Listagem -->
+    <div class="card border-0 shadow-lg">
+        <div class="card-body p-4">
+            <h4 class="fw-bold text-primary mb-4"><i class="fas fa-list-ul me-2"></i>Consultas Marcadas</h4>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="text-primary">Data</th>
+                            <th class="text-primary">Horário</th>
+                            <th class="text-primary">Tipo</th>
+                            <th class="text-primary text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="consultationsTableBody" class="payment-card">
+                        <!-- Dados via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<style>
+/* Estilos Específicos para Consultas */
+.form-select, .form-control {
+    border: 2px solid #dee2e6;
+    transition: border-color 0.3s ease;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+
+.error-message {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Alertas Flutuantes */
+.alert-floating {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    min-width: 300px;
+    opacity: 0;
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Botão Success */
+.btn-success {
+    background: linear-gradient(to right, #198754, #157347);
+    color: white !important;
+}
+
+/* Tabela de Consultas */
+.table-hover tbody tr {
+    transition: transform 0.2s, box-shadow 0.2s;
+    background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
+}
+
+.table-hover tbody tr:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
+}
+</style>
 @endsection
+
+<!-- Scripts permanecem iguais -->
 
 @section('scripts')
 <!-- Bootstrap JS -->
