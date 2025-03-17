@@ -17,28 +17,35 @@
 <body>
 
 
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="input-group mb-3">
-          <input type="text" id="searchInput" class="form-control" placeholder="Procurar eventos">
-          <button id="searchButton" class="btn btn-primary">{{ __('Procurar') }}</button>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="btn-group mb-3" role="group">
-          <button id="exportButton" class="btn btn-success">{{ __('Exportar Calendário') }}</button>
-          <a href="{{ URL('add-schedule') }}" class="btn btn-success">{{ __('Adicionar Evento') }}</a>
-        </div>
+<div class="container mt-5">
+  <div class="row mb-3">
+    <!-- Coluna da busca -->
+    <div class="col-md-6">
+      <div class="input-group">
+        <input type="text" id="searchInput" class="form-control" placeholder="Procurar eventos">
+        <button id="searchButton" class="btn btn-primary">{{ __('Procurar') }}</button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-body">
-        <div id="calendar" style="width: 100%; height: 100vh;"></div>
+    <!-- Coluna dos botões -->
+    <div class="col-md-6">
+      <div class="d-flex gap-2 align-items-center justify-content-end">
+        <div class="btn-group">
+          <button id="exportButton" class="btn btn-success">{{ __('Exportar Calendário') }}</button>
+          <a href="{{ URL('add-schedule') }}" class="btn btn-success">{{ __('Adicionar Evento') }}</a>
+        </div>
+        <a href="{{ route('dashboard') }}" class="btn btn-outline-primary ms-2">{{ __('Voltar ao painel de controle') }}</a>
       </div>
     </div>
   </div>
+
+  <!-- Calendário -->
+  <div class="card">
+    <div class="card-body">
+      <div id="calendar" style="width: 100%; height: 100vh;"></div>
+    </div>
+  </div>
+</div>
 
   <!-- Modal para Edição de Evento -->
   <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
@@ -87,7 +94,62 @@
       </div>
     </div>
   </div>
+  <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 1rem;
+        }
+        
 
+        .calendar-container {
+            margin-top: 1.5rem;
+        }
+
+        .header-section {
+            margin-bottom: 1.5rem;
+        }
+
+        #calendar {
+            height: 125vh;
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.25rem;
+            color: #2c3e50;
+        }
+
+        .fc-button {
+            padding: 0.5rem 1rem !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .fc-event {
+            padding: 0.5rem !important;
+            margin: 0.25rem 0 !important;
+            border-left: 4px solid rgba(0,0,0,0.15) !important;
+        }
+
+        .modal-content {
+            border-radius: 0.75rem;
+            border: none;
+        }
+
+        @media (max-width: 768px) {
+            #calendar {
+                height: 65vh;
+                padding: 0.5rem;
+            }
+            
+            .header-section {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
   <!-- Scripts do Flatpickr -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>

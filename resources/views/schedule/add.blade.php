@@ -3,53 +3,150 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <style>
-    body {
-        background-color: #f8f9fa;
-    }
+/* ========== ESTILOS GLOBAIS ========== */
+body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
 
+/* ========== CONTAINER DO FORMULÁRIO ========== */
+.form-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 0.75rem 2rem rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+h4 {
+    color: #2c3e50;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+h4:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, #0d6efd 0%, #0b5ed7 100%);
+    border-radius: 2px;
+}
+
+/* ========== COMPONENTES DO FORMULÁRIO ========== */
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+    background: white;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+/* ========== CHECKBOX PERSONALIZADO ========== */
+.form-check-input {
+    width: 1.25em;
+    height: 1.25em;
+    margin-top: 0.25em;
+    border: 2px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+}
+
+/* ========== SELECT DE TIPO DE EVENTO ========== */
+.event-type-select {
+    border: 2px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    transition: all 0.3s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px 12px;
+}
+
+.event-type-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+}
+
+/* ========== BOTÃO PRIMÁRIO ========== */
+.btn-success {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1.5rem rgba(25, 135, 84, 0.3);
+}
+
+.btn-success:active {
+    transform: translateY(0);
+    box-shadow: 0 0.25rem 0.75rem rgba(25, 135, 84, 0.2);
+}
+
+/* ========== RESPONSIVIDADE ========== */
+@media (max-width: 768px) {
     .form-container {
-        max-width: 500px;
-        margin: 50px auto;
-        background: #ffffff;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        margin: 1.5rem;
+        padding: 1.75rem;
+        border-radius: 1rem;
     }
-
-    label {
-        font-weight: bold;
-        margin-top: 15px;
+    
+    h4 {
+        font-size: 1.5rem;
+        padding-bottom: 0.75rem;
     }
-
+    
     .form-control {
-        border-radius: 8px;
-        padding: 10px;
+        padding: 0.75rem 1rem;
     }
+}
 
-    .btn-success {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        font-weight: bold;
-        transition: background 0.3s;
-    }
+/* ========== ANIMAÇÕES ========== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-    .btn-success:hover {
-        background: #28a745;
-    }
-
-    .color-picker {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .color-preview {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 1px solid #ddd;
-    }
+.form-container {
+    animation: fadeIn 0.6s ease-out;
+}
 </style>
 
 <div class="container">
