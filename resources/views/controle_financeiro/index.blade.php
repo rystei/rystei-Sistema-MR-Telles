@@ -1,5 +1,171 @@
 @extends('layouts.app')
 
+<style>
+    /* ========== ESTILOS GERAIS ========== */
+    .container {
+        padding: 2rem 0;
+    }
+
+    h1 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    /* ========== COMPONENTES DE BOTÃO ========== */
+    a.btn, button.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.875rem !important;
+        border-radius: 0.375rem !important;
+        line-height: 1;
+        vertical-align: middle;
+        height: 2.5rem;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+
+    .btn-primary {
+        background: linear-gradient(to right, #0d6efd, #0b5ed7);
+        color: white !important;
+    }
+
+    .btn-danger {
+        background: linear-gradient(to right, #dc3545, #c82333);
+        color: white !important;
+    }
+
+    .btn-success {
+        background: linear-gradient(to right, #198754, #157347);
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* ========== COMPONENTES DE CARD ========== */
+    .card {
+        border-radius: 0.75rem;
+        overflow: hidden;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.05);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card-header {
+        background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        border-bottom: 2px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    /* ========== ANIMAÇÕES DA TABELA ========== */
+    tr {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(0);
+        position: relative;
+        background-color: inherit;
+    }
+
+    tr:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+    }
+
+    td {
+        position: relative;
+        vertical-align: middle;
+        border-color: #f8f9fa;
+        background-color: inherit !important;
+    }
+
+    td::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 1px solid transparent;
+        transition: inherit;
+        pointer-events: none;
+    }
+
+    tr:hover td::after {
+        border-color: rgba(13, 110, 253, 0.15);
+    }
+
+    /* ========== ELEMENTOS DA TABELA ========== */
+    .table th {
+        background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        border-bottom: 2px solid #dee2e6;
+        color: #2c3e50;
+    }
+
+    .status-badge {
+        border-radius: 6px;
+        padding: 0.35rem 1rem;
+        font-size: 0.9rem;
+        display: inline-block;
+        border: 1px solid rgba(13, 110, 253, 0.2);
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+
+    /* ========== FORMULÁRIOS ========== */
+    .form-control {
+        border: 2px solid #dee2e6;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    }
+
+    /* ========== RESPONSIVIDADE ========== */
+    @media (max-width: 768px) {
+        .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        tr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    }
+
+    /* ========== ELEMENTOS ESPECÍFICOS ========== */
+    .alert-success {
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .lote-group {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .empty-state {
+        opacity: 0.8;
+        text-align: center;
+        padding: 2rem;
+    }
+</style>
+
 @section('content')
 <div class="container">
     <h1 class="mb-4">Controle Financeiro</h1>
