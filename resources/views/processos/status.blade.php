@@ -1,12 +1,10 @@
-{{-- resources/views/processos/status.blade.php --}}
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2>Gerenciar Status do Processo: {{ $processo->id }}</h2>
+<div class="container my-5">
+    <h2 class="mb-4 text-center">Gerenciar Status do Processo: {{ $processo->id }}</h2>
 
     @php
-        // Definição completa dos status disponíveis (para o dropdown)
         $allStatuses = [
             'protocolado'                 => 'Protocolado',
             'audiencia_conciliação'       => 'Audiência de Conciliação',
@@ -25,17 +23,19 @@
         $normalizedCurrentStatus = strtolower(trim($processo->status_atual));
 
         // Garante que o histórico seja um array
-        $historico = is_array($processo->historico) ? $processo->historico : json_decode($processo->historico, true) ?? [];
+        $historico = is_array($processo->historico)
+            ? $processo->historico
+            : json_decode($processo->historico, true) ?? [];
     @endphp
 
     <!-- Formulário de Atualização de Status -->
-    <div class="card mb-4">
+    <div class="card mb-4 shadow-sm">
         <div class="card-body">
             <form method="POST" action="{{ route('processos.updateStatus', $processo) }}">
                 @csrf
                 @method('PUT')
-                <div class="form-group">
-                    <label for="novo_status">Selecione o novo status</label>
+                <div class="mb-3">
+                    <label for="novo_status" class="form-label">Selecione o novo status</label>
                     <select name="novo_status" id="novo_status" class="form-control" required>
                         @foreach ($allStatuses as $key => $label)
                             <option value="{{ $key }}" {{ $key == $normalizedCurrentStatus ? 'selected' : '' }}>
@@ -44,13 +44,21 @@
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Atualizar Status</button>
+                <!-- Novo campo para selecionar a data do status -->
+                <div class="mb-3">
+                    <label for="data_status" class="form-label">Data do Status</label>
+                    <input type="datetime-local" name="data_status" id="data_status" class="form-control" value="{{ old('data_status', now()->format('Y-m-d\TH:i')) }}" required>
+                    <small class="text-muted">Selecione a data e hora em que a decisão ocorreu.</small>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">
+                    Atualizar Status
+                </button>
             </form>
         </div>
     </div>
 
     <!-- Histórico de Atualizações com opção de exclusão -->
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
             <h5 class="mb-3">Histórico de Atualizações</h5>
             <ul class="list-group">
@@ -71,15 +79,34 @@
         </div>
     </div>
 </div>
+
 <style>
 /* ========== ESTILOS GLOBAIS ========== */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+h2 {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+/* Card */
 .card {
     border: none;
     border-radius: 0.75rem;
     box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.08);
     transition: all 0.3s ease;
+    background: #ffffff;
+    margin-bottom: 1.5rem;
 }
 
+.card:hover {
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.1);
+}
+
+/* Botões */
 .btn {
     transition: all 0.2s ease;
     font-weight: 500;
@@ -91,7 +118,7 @@
 .btn-primary {
     background: linear-gradient(to right, #0d6efd, #0b5ed7);
     border: none;
-    color: white !important;
+    color: #fff !important;
 }
 
 .btn-danger {
@@ -99,22 +126,32 @@
     border: none;
 }
 
-/* ========== FORMULÁRIO ========== */
-.form-select, .form-control {
+/* Formulários */
+.form-label {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control, .form-select {
     border: 2px solid #dee2e6;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
     transition: border-color 0.3s ease;
 }
 
-.form-select:focus, .form-control:focus {
+.form-control:focus, .form-select:focus {
     border-color: #0d6efd;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
 }
 
-/* ========== LISTA DE HISTÓRICO ========== */
+/* Lista de Histórico */
 .list-group-item {
     border: none;
     margin-bottom: 0.75rem;
-    border-radius: 0.5rem !important;
+    border-radius: 0.5rem;
     background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
     box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.05);
     transition: all 0.3s ease;
@@ -123,40 +160,6 @@
 .list-group-item:hover {
     transform: translateX(8px);
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.08);
-}
-
-/* ========== STATUS BADGE ========== */
-.status-badge {
-    border-radius: 6px;
-    padding: 0.35rem 1rem;
-    font-size: 0.9rem;
-    border: 1px solid rgba(13, 110, 253, 0.2);
-    background-color: rgba(13, 110, 253, 0.1);
-    color: #0d6efd;
-    display: inline-block;
-}
-
-/* ========== ESTADO VAZIO ========== */
-.empty-state {
-    opacity: 0.8;
-    padding: 2rem 0;
-    text-align: center;
-}
-
-.empty-state i {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #6c757d;
-}
-
-/* ========== EFEITOS HOVER ========== */
-.btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.card:hover {
-    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.1);
 }
 </style>
 @endsection

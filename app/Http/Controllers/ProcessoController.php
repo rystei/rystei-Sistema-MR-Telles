@@ -76,31 +76,40 @@ class ProcessoController extends Controller
 
         // Atualizar Status do Processo
         public function updateStatus(Request $request, Processo $processo)
-    {
-        // Validação: permita somente os status definidos no fluxo
-        $allowedStatuses = 'protocolado,audiencia_conciliação,acordo,audiencia_instrucao,aguardando_sentenca,sentenca,sentenca_primeiro_grau,recursos,aguardando_sentenca_tribunal,decisao_tribunal,encerrado';
-        $request->validate([
-            'novo_status' => 'required|in:' . $allowedStatuses
-        ]);
-
-        // Converte o histórico para array, se necessário
-        $historico = is_array($processo->historico) ? $processo->historico : json_decode($processo->historico, true) ?? [];
-
-        // Adiciona a nova atualização ao histórico
-        $historico[] = [
-            'status' => $request->novo_status,
-            'data' => now()->format('d/m/Y H:i'),
-            'responsavel' => auth()->user()->name
-        ];
-
-        // Atualiza o status e o histórico do processo
-        $processo->update([
-            'status_atual' => $request->novo_status,
-            'historico' => $historico
-        ]);
-
-        return redirect()->route('processos.index')->with('success', 'Status atualizado!');
-    }
+        {
+            // Validação: permita somente os status definidos no fluxo
+            $allowedStatuses = 'protocolado,audiencia_conciliação,acordo,audiencia_instrucao,aguardando_sentenca,sentenca,sentenca_primeiro_grau,recursos,aguardando_sentenca_tribunal,decisao_tribunal,encerrado';
+            
+            $request->validate([
+                'novo_status' => 'required|in:' . $allowedStatuses,
+                'data_status' => 'required|date' // Validação para garantir que a data seja válida
+            ]);
+        
+            // Converte o histórico para array, se necessário
+            $historico = is_array($processo->historico)
+                ? $processo->historico
+                : json_decode($processo->historico, true) ?? [];
+        
+            // Formata a data selecionada para o formato desejado "d/m/Y H:i"
+            $dataFormatada = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $request->data_status)
+                                ->format('d/m/Y H:i');
+        
+            // Adiciona a nova atualização ao histórico com a data formatada
+            $historico[] = [
+                'status' => $request->novo_status,
+                'data' => $dataFormatada,
+                'responsavel' => auth()->user()->name
+            ];
+        
+            // Atualiza o status e o histórico do processo
+            $processo->update([
+                'status_atual' => $request->novo_status,
+                'historico' => json_encode($historico)
+            ]);
+        
+            return redirect()->route('processos.index')->with('success', 'Status atualizado!');
+        }
+        
 
     public function deleteHistorico(Processo $processo, $index)
     {

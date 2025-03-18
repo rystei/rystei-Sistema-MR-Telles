@@ -120,8 +120,7 @@
                                 <td>{{ Str::limit($processo->descricao, 40) }}</td>
                                 <td>
                                     <span class="status-badge">
-                                        {{ ucfirst($processo->status_atual) }}
-                                    </span>
+                                    {{ $processo->statusFormatado() }}                                    </span>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex gap-2 justify-content-center">
