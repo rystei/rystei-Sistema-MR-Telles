@@ -37,69 +37,71 @@
 </head>
 <body>
 <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar de Navegação -->
-            <nav class="col-md-2 sidebar">
-                <div class="sidebar-sticky pt-3">
-                    <h4 class="text-center">Menu</h4>
-                    <ul class="nav flex-column">
+                    <div class="row">
+                        <!-- Sidebar de Navegação -->
+                        <nav class="col-md-2 sidebar">
+                            <div class="sidebar-sticky pt-3">
+                                <h4 class="text-center">Menu</h4>
+                                <ul class="nav flex-column">
                     <li class="nav-item">
-              <a class="nav-link active" href="{{ route('dashboard') }}">Dashboard</a>
-            </li>
-            @unless (!request()->user()->is_admin)
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('controle_financeiro.index') }}">Parcelas</a>
-            </li>
-            @endunless
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('controle_financeiro.minhas') }}">Minhas Parcelas</a>
-            </li>
-            @unless (!request()->user()->is_admin)
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('agendar_compromissos') }}">Eventos</a>
-            </li>
-            @endunless
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('marcar_consulta') }}">Marcar consulta</a>
-            </li>
-            @unless (!request()->user()->is_admin)
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('financeiro') }}">Pix calculo</a>
-            </li>
-            @endunless
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('pagamento') }}">Pagamento</a>
-            </li>
-            @unless (!request()->user()->is_admin)
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('processos.index') }}">Gerenciamento processos</a>
-            </li>
-            @endunless
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('processos.meus') }}">Acompanhar processos</a>
-            </li>
+                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Home</a>
+                    </li>
+                    @unless (!request()->user()->is_admin)
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                Sair
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                @csrf
-                            </form>
+                            <a class="nav-link {{ request()->routeIs('controle_financeiro.index') ? 'active' : '' }}" href="{{ route('controle_financeiro.index') }}">Parcelas</a>
                         </li>
-                    </ul>
-                </div>
-            </nav>
+                    @endunless
+                    @unless (request()->user()->is_admin)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('controle_financeiro.minhas') ? 'active' : '' }}" href="{{ route('controle_financeiro.minhas') }}">Minhas Parcelas</a>
+                        </li>
+                    @endunless
+                    @unless (!request()->user()->is_admin)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('agendar_compromissos') ? 'active' : '' }}" href="{{ route('agendar_compromissos') }}">Eventos</a>
+                        </li>
+                    @endunless
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('marcar_consulta') ? 'active' : '' }}" href="{{ route('marcar_consulta') }}">Marcar consulta</a>
+                    </li>
+                    @unless (!request()->user()->is_admin)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('financeiro') ? 'active' : '' }}" href="{{ route('financeiro') }}">Pix calculo</a>
+                        </li>
+                    @endunless
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('pagamento') ? 'active' : '' }}" href="{{ route('pagamento') }}">Pagamento</a>
+                    </li>
+                    @unless (!request()->user()->is_admin)
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('processos.index') ? 'active' : '' }}" href="{{ route('processos.index') }}">Gerenciamento processos</a>
+                        </li>
+                    @endunless
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('processos.meus') ? 'active' : '' }}" href="{{ route('processos.meus') }}">Acompanhar processos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('logout') }}"
+                          onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            Sair
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </nav>
 
-            <!-- Conteúdo Principal -->
-            <main role="main" class="col-md-9 ms-sm-auto col-lg-10 content">
-                @yield('content')
-            </main>
-        </div>
+        <!-- Conteúdo Principal -->
+        <main role="main" class="col-md-9 ms-sm-auto col-lg-10 content">
+            @yield('content')
+        </main>
     </div>
+</div>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">    
-    @yield('scripts')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">    
+@yield('scripts')
 </body>
 </html>
