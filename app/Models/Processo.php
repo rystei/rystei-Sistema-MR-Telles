@@ -5,6 +5,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class Processo extends Model
 {
@@ -13,13 +15,16 @@ class Processo extends Model
         'numero_processo',
         'descricao',
         'status_atual',
-        'historico'
+        'id',
     ];
+   
+    protected $primaryKey = 'numero_processo';
 
-    protected $casts = [
-        'historico' => 'array',
-    ];
-
+    public function historico():HasMany
+    {
+        return $this->hasMany(Historico::class, 'processo_id', 'id');
+    
+    }
 
     public function cliente(): BelongsTo
     {

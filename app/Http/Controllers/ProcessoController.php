@@ -6,6 +6,8 @@ namespace App\Http\Controllers;
 use App\Models\Processo;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use App\Models\Historico;
 
 class ProcessoController extends Controller
 {
@@ -41,26 +43,25 @@ class ProcessoController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'numero_processo' => 'required|unique:processos',
-            'descricao' => 'required|min:5' // Reduza para teste ou corrija o input
+            'descricao' => 'required|min:1' // Reduza para teste ou corrija o input
         ]);
-
+        //dd();
         try {
-            Processo::create([
+            $p = Processo::create([
                 'user_id' => $request->user_id,
                 'numero_processo' => $request->numero_processo,
                 'descricao' => $request->descricao,
-                'status_atual' => 'protocolado',
-                'historico' => json_encode([ // Converta para JSON!
-                    [
-                        'status' => 'protocolado',
-                        'data' => now()->toDateTimeString()
-                    ]
-                ])
             ]);
-
+            //dd($p);
+            Historico::create([
+                'created_at' => Carbon::now(),
+                'processo_id' =>$p->numero_processo,
+            ]);
+           // dd();
             return redirect()->route('processos.index')->with('success', 'Processo criado!');
 
         } catch (\Exception $e) {
+           // dd($e);
             return back()
                 ->withInput()
                 ->withErrors(['error' => 'Erro ao criar processo: ' . $e->getMessage()]);

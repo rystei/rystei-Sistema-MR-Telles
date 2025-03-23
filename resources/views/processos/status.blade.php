@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container my-5">
-    <h2 class="mb-4 text-center">Gerenciar Status do Processo: {{ $processo->id }}</h2>
+    <h2 class="mb-4 text-center">Gerenciar Status do Processo: {{ $processo->numero_processo }}</h2>
 
     @php
         $allStatuses = [
@@ -21,11 +21,6 @@
 
         // Normaliza o status atual para comparação
         $normalizedCurrentStatus = strtolower(trim($processo->status_atual));
-
-        // Garante que o histórico seja um array
-        $historico = is_array($processo->historico)
-            ? $processo->historico
-            : json_decode($processo->historico, true) ?? [];
     @endphp
 
     <!-- Formulário de Atualização de Status -->
@@ -62,11 +57,11 @@
         <div class="card-body">
             <h5 class="mb-3">Histórico de Atualizações</h5>
             <ul class="list-group">
-                @foreach ($historico as $index => $etapa)
+                @foreach ($processo->historico as $index => $etapa)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <strong>{{ $processo->statusFormatado($etapa['status']) }}</strong>
-                            <small class="text-muted"> - {{ $etapa['data'] }}</small>
+                            <small class="text-muted"> - {{ $etapa['created_at'] }}</small>
                         </div>
                         <form action="{{ route('processos.deleteHistorico', ['processo' => $processo->id, 'index' => $index]) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esse registro?');">
                             @csrf
