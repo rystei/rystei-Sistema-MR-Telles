@@ -2,56 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PixTransaction;
 use Illuminate\Http\Request;
 use BaconQrCode\Writer;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use Illuminate\Support\Facades\Log;
 
 class GerenciarRecursosFinanceiro extends Controller
 {
     public function index()
     {
-        return view('financeiro.index');
+        $generatedPix = PixTransaction::latest()->get();
+        return view('financeiro.index', compact('generatedPix'));
     }
 
     public function calculate(Request $request)
     {
-        // Validação direta dos campos recebidos
+        Log::debug('Dados recebidos:', $request->all());
+        
         $validated = $request->validate([
             'total_amount' => 'required|numeric|min:0.01',
-            'percentage' => 'required|numeric|min:0.01|max:100',
-            'installments' => 'required|integer|min:1'
+            'client_name' => 'required|string|max:255'
         ]);
 
+        Log::debug('Dados validados:', $validated);
+
         try {
-            // Cálculo direto com os valores recebidos
-            $chargeAmount = ($validated['percentage'] / 100) * $validated['total_amount'];
+            $pixPayload = $this->generatePixPayload($validated['total_amount']);
+            Log::debug('Payload PIX gerado:', ['payload' => $pixPayload]);
             
-            // Geração do payload PIX
-            $pixPayload = $this->generatePixPayload($chargeAmount);
-            
-            // Geração do QR Code
             $renderer = new ImageRenderer(
-                new RendererStyle(400),
+                new RendererStyle(300),
                 new SvgImageBackEnd()
             );
-            
             $qrCode = (new Writer($renderer))->writeString($pixPayload);
+
+            $pix = PixTransaction::create([
+                'client_name' => $validated['client_name'],
+                'total_amount' => $validated['total_amount'],
+                'pix_payload' => $pixPayload,
+                'transaction_date' => now()
+            ]);
 
             return view('financeiro.index', [
                 'qrCode' => $qrCode,
-                'chargeAmount' => $chargeAmount,
                 'pixPayload' => $pixPayload,
-                'oldInput' => $request->all()
+                'pixData' => $pix,
+                'generatedPix' => PixTransaction::latest()->get(),
+                'success' => 'PIX gerado com sucesso!'
             ]);
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Erro: ' . $e->getMessage()]);
+            Log::error('Erro ao gerar PIX:', ['error' => $e->getMessage()]);
+            return back()->withErrors(['error' => 'Erro ao gerar PIX: ' . $e->getMessage()]);
         }
     }
 
-    // Métodos removidos: cleanCurrency() e cleanPercentage()
+
+    public function destroy($id)
+    {
+        try {
+            $pix = PixTransaction::findOrFail($id);
+            $pix->delete();
+            
+            return redirect()->route('financeiro')
+                ->with('success', 'PIX excluído com sucesso!');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Erro ao excluir PIX: ' . $e->getMessage()]);
+        }
+    }
 
     private function generatePixPayload($amount)
     {

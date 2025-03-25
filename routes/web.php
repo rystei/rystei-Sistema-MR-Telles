@@ -29,9 +29,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-
-    Route::get('/financeiro', [GerenciarRecursosFinanceiro::class, 'index'])->name('financeiro')->middleware(IsAdmin::class);
-    Route::post('/financeiro/calcular', [GerenciarRecursosFinanceiro::class, 'calculate'])->name('financeiro.calculate');
+    
+    Route::prefix('financeiro')->group(function () {
+        Route::get('/', [App\Http\Controllers\GerenciarRecursosFinanceiro::class, 'index'])->name('financeiro');
+        Route::post('/calcular', [App\Http\Controllers\GerenciarRecursosFinanceiro::class, 'calculate'])->name('financeiro.calculate');
+        Route::delete('/pix/{id}', [App\Http\Controllers\GerenciarRecursosFinanceiro::class, 'destroy'])->name('financeiro.pix.delete');
+    });
     
     Route::prefix('controle-financeiro')->group(function () {
         Route::get('/', [ControleFinanceiroController::class, 'index'])->name('controle_financeiro.index')->middleware(IsAdmin::class);;
