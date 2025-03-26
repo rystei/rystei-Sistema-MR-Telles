@@ -34,7 +34,14 @@
             min-height: 100vh;
             font-family: 'Arial', sans-serif;
         }
+        .sidebar .nav-link {
+        color: white !important;
+        transition: color 0.3s ease !important;
+    }
 
+    .sidebar .nav-link:hover {
+        color: #1F140A !important;
+    }
         /* Sidebar Estilizado */
         .sidebar {
             background: var(--marrom-escuro);

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
     <style>
-:root {
+        :root {
             --bege: #E6E0D6;
             --marrom-escuro: #B08968;
             --marrom-claro: #B29463;
@@ -38,49 +38,44 @@
         .login-section {
             flex: 1;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
             padding: 2rem;
             background: var(--bege);
             position: relative;
         }
 
-        .login-card {
-            background: white;
+        .login-content {
             width: 100%;
-            max-width: 720px; /* Alterado */
-            padding: 3rem; /* Alterado */
-            border-radius: 24px; /* Alterado */
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 400px;
             animation: slideUp 0.8s ease-out;
-            max-height: 95vh;
-            overflow-y: auto;
         }
 
         .login-title {
             text-align: center;
             color: var(--marrom-escuro);
-            margin-bottom: 2.4rem; /* Alterado */
-            font-size: 2.2rem; /* Alterado */
+            margin-bottom: 2.5rem;
+            font-size: 2.2rem;
         }
 
         .form-group {
-            margin-bottom: 1.8rem; /* Alterado */
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 0.6rem; /* Ajuste fino */
+            margin-bottom: 0.5rem;
             color: var(--marrom-escuro);
             font-weight: 500;
         }
 
         .form-input {
             width: 100%;
-            padding: 1.2rem; /* Alterado */
+            padding: 1rem;
             border: 2px solid var(--marrom-claro);
             border-radius: 8px;
-            font-size: 1.1rem; /* Alterado */
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
             transition: all 0.3s ease;
         }
 
@@ -88,28 +83,28 @@
             display: flex;
             align-items: center;
             gap: 0.8rem;
-            margin: 1.8rem 0; /* Alterado */
+            margin: 1.5rem 0;
         }
 
         .login-button {
             width: 100%;
-            padding: 1.2rem; /* Alterado */
+            padding: 1rem;
             background: var(--marrom-claro);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1.2rem; /* Alterado */
+            font-size: 1.1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
         }
 
         .links-container {
-            margin-top: 1.8rem; /* Alterado */
+            margin-top: 1.5rem;
             text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 1.2rem; /* Alterado */
+            gap: 1rem;
         }
 
         @media (max-width: 768px) {
@@ -118,27 +113,20 @@
             }
 
             .logo-section {
-                padding: 2rem;
-                min-height: 30vh; /* Reduzido */
+                padding: 1.5rem;
+                min-height: 200px;
             }
 
             .login-section {
-                padding: 1rem;
-                min-height: 70vh; /* Ajustado */
+                padding: 2rem;
+                min-height: calc(100vh - 200px);
             }
 
-            .login-card {
-                padding: 1.5rem;
-                margin: 1rem;
-                max-height: none;
-            }
-
-            .login-title {
-                font-size: 1.5rem;
+            .login-content {
+                max-width: 100%;
             }
         }
 
-        /* Restante das animações permanece igual */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -165,7 +153,7 @@
 
         <!-- Seção de Login -->
         <div class="login-section">
-            <div class="login-card">
+            <div class="login-content">
                 <h1 class="login-title">Bem-vindo</h1>
 
                 @if(session('status'))
