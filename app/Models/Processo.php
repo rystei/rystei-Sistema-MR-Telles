@@ -18,12 +18,9 @@ class Processo extends Model
         'id',
     ];
    
-    protected $primaryKey = 'numero_processo';
-
-    public function historico():HasMany
+    public function historico(): HasMany
     {
-        return $this->hasMany(Historico::class, 'processo_id', 'id');
-    
+        return $this->hasMany(Historico::class, 'processo_id');
     }
 
     public function cliente(): BelongsTo

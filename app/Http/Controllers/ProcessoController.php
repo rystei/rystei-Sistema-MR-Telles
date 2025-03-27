@@ -43,28 +43,27 @@ class ProcessoController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'numero_processo' => 'required|unique:processos',
-            'descricao' => 'required|min:1' // Reduza para teste ou corrija o input
+            'descricao' => 'required|min:1'
         ]);
-        //dd();
+
         try {
-            $p = Processo::create([
+            $processo = Processo::create([
                 'user_id' => $request->user_id,
                 'numero_processo' => $request->numero_processo,
                 'descricao' => $request->descricao,
+                'status_atual' => 'protocolado',
             ]);
-            //dd($p);
-            Historico::create([
-                'created_at' => Carbon::now(),
-                'processo_id' =>$p->numero_processo,
-            ]);
-           // dd();
-            return redirect()->route('processos.index')->with('success', 'Processo criado!');
 
+            // Cria o primeiro registro no histórico
+            Historico::create([
+                'processo_id' => $processo->id, // Usa o ID do processo
+                'status_atual' => 'protocolado',
+                'created_at' => now(),
+            ]);
+
+            return redirect()->route('processos.index')->with('success', 'Processo criado!');
         } catch (\Exception $e) {
-           // dd($e);
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Erro ao criar processo: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Erro ao criar processo: ' . $e->getMessage()]);
         }
     }
     public function editStatus(Processo $processo)
@@ -78,57 +77,33 @@ class ProcessoController extends Controller
         // Atualizar Status do Processo
         public function updateStatus(Request $request, Processo $processo)
         {
-            // Validação: permita somente os status definidos no fluxo
             $allowedStatuses = 'protocolado,audiencia_conciliação,acordo,audiencia_instrucao,aguardando_sentenca,sentenca,sentenca_primeiro_grau,recursos,aguardando_sentenca_tribunal,decisao_tribunal,encerrado';
             
             $request->validate([
                 'novo_status' => 'required|in:' . $allowedStatuses,
-                'data_status' => 'required|date' // Validação para garantir que a data seja válida
+                'data_status' => 'required|date'
             ]);
-        
-            // Converte o histórico para array, se necessário
-            $historico = is_array($processo->historico)
-                ? $processo->historico
-                : json_decode($processo->historico, true) ?? [];
-        
-            // Formata a data selecionada para o formato desejado "d/m/Y H:i"
-            $dataFormatada = \Carbon\Carbon::createFromFormat('Y-m-d\TH:i', $request->data_status)
-                                ->format('d/m/Y H:i');
-        
-            // Adiciona a nova atualização ao histórico com a data formatada
-            $historico[] = [
-                'status' => $request->novo_status,
-                'data' => $dataFormatada,
-                'responsavel' => auth()->user()->name
-            ];
-        
-            // Atualiza o status e o histórico do processo
-            $processo->update([
+    
+            // Cria novo registro no histórico
+            Historico::create([
+                'processo_id' => $processo->id,
                 'status_atual' => $request->novo_status,
-                'historico' => json_encode($historico)
+                'created_at' => Carbon::createFromFormat('Y-m-d\TH:i', $request->data_status),
             ]);
-        
+    
+            // Atualiza status do processo
+            $processo->update(['status_atual' => $request->novo_status]);
+    
             return redirect()->route('processos.index')->with('success', 'Status atualizado!');
         }
         
 
-    public function deleteHistorico(Processo $processo, $index)
-    {
-        // Converte o histórico para array, se necessário
-        $historico = is_array($processo->historico) ? $processo->historico : json_decode($processo->historico, true) ?? [];
-        
-        // Verifica se o índice existe
-        if (isset($historico[$index])) {
-            // Remove o item do histórico
-            array_splice($historico, $index, 1);
-            
-            // Atualiza o registro no banco
-            $processo->update(['historico' => $historico]);
-            return redirect()->back()->with('success', 'Registro de histórico removido com sucesso!');
-        } else {
-            return redirect()->back()->with('error', 'Registro de histórico não encontrado.');
+        public function deleteHistorico(Processo $processo, Historico $historico)
+        {
+            $historico->delete();
+            return redirect()->back()->with('success', 'Registro removido!');
         }
-    }
+    
 
     public function destroy(Processo $processo)
     {

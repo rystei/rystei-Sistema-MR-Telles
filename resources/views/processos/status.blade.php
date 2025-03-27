@@ -52,18 +52,18 @@
         </div>
     </div>
 
-    <!-- Histórico de Atualizações com opção de exclusão -->
-    <div class="card shadow-sm">
+ <!-- Histórico de Atualizações -->
+ <div class="card shadow-sm">
         <div class="card-body">
             <h5 class="mb-3">Histórico de Atualizações</h5>
             <ul class="list-group">
-                @foreach ($processo->historico as $index => $etapa)
+                @foreach ($processo->historico->sortBy('created_at') as $registro)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>{{ $processo->statusFormatado($etapa['status']) }}</strong>
-                            <small class="text-muted"> - {{ $etapa['created_at'] }}</small>
+                            <strong>{{ $processo->statusFormatado($registro->status_atual) }}</strong>
+                            <small class="text-muted"> - {{ $registro->created_at->format('d/m/Y H:i') }}</small>
                         </div>
-                        <form action="{{ route('processos.deleteHistorico', ['processo' => $processo->id, 'index' => $index]) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esse registro?');">
+                        <form action="{{ route('processos.deleteHistorico', ['processo' => $processo, 'historico' => $registro]) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
