@@ -171,25 +171,31 @@
                             <a class="nav-link {{ request()->routeIs('agendar_compromissos') ? 'active' : '' }}" href="{{ route('agendar_compromissos') }}">Eventos</a>
                         </li>
                     @endunless
+                    @unless (request()->user()->is_admin)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('marcar_consulta') ? 'active' : '' }}" href="{{ route('marcar_consulta') }}">Marcar consulta</a>
                     </li>
+                    @endunless
                     @unless (!request()->user()->is_admin)
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('financeiro') ? 'active' : '' }}" href="{{ route('financeiro') }}">Pix calculo</a>
                         </li>
                     @endunless
+                    @unless (request()->user()->is_admin)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('pagamento') ? 'active' : '' }}" href="{{ route('pagamento') }}">Pagamento</a>
                     </li>
+                    @endunless
                     @unless (!request()->user()->is_admin)
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('processos.index') ? 'active' : '' }}" href="{{ route('processos.index') }}">Gerenciamento processos</a>
                         </li>
                     @endunless
+                    @unless (request()->user()->is_admin)
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('processos.meus') ? 'active' : '' }}" href="{{ route('processos.meus') }}">Acompanhar processos</a>
                     </li>
+                    @endunless
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('logout') }}"
                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

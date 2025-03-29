@@ -20,22 +20,16 @@
             <h5 class="mb-0">Histórico de Atualizações</h5>
         </div>
         <div class="card-body">
-            @php
-                $historico = is_array($processo->historico)
-                    ? $processo->historico
-                    : json_decode($processo->historico, true) ?? [];
-            @endphp
-
-            @if (count($historico) > 0)
+            @if ($processo->historico->count() > 0)
                 <div class="timeline">
-                    @foreach ($historico as $etapa)
+                    @foreach ($processo->historico->sortBy('created_at') as $registro)
                         <div class="timeline-item">
                             <div class="timeline-icon">
                                 <i class="bi bi-check-circle-fill"></i>
                             </div>
                             <div class="timeline-content">
-                                <h5 class="mb-1">{{ $processo->statusFormatado($etapa['status']) }}</h5>
-                                <small class="text-muted">{{ $etapa['data'] }}</small>
+                                <h5 class="mb-1">{{ $processo->statusFormatado($registro->status_atual) }}</h5>
+                                <small class="text-muted">{{ $registro->created_at->format('d/m/Y H:i') }}</small>
                             </div>
                         </div>
                     @endforeach
@@ -47,6 +41,7 @@
             @endif
         </div>
     </div>
+</div>
 </div>
 @endsection
 

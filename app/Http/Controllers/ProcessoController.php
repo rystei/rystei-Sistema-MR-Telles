@@ -29,9 +29,9 @@ class ProcessoController extends Controller
             $numero = $request->numero_processo;
             $query->where('numero_processo', 'LIKE', '%' . $numero . '%');
         }
-    
+        
         // Pagina os resultados (por exemplo, 10 processos por página)
-        $processos = $query->paginate(8);
+        $processos = $query->latest()->paginate(8);
         $clientes = User::all();
         return view('processos.index', compact('processos', 'clientes'));
     }
