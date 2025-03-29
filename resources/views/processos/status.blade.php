@@ -57,7 +57,7 @@
         <div class="card-body">
             <h5 class="mb-3">Histórico de Atualizações</h5>
             <ul class="list-group">
-                @foreach ($processo->historico->sortBy('created_at') as $registro)
+                @foreach ($processo->historicos->sortBy('created_at') as $registro)
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <strong>{{ $processo->statusFormatado($registro->status_atual) }}</strong>

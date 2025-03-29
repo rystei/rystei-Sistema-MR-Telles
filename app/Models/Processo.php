@@ -18,7 +18,7 @@ class Processo extends Model
         'id',
     ];
    
-    public function historico(): HasMany
+    public function historicos(): HasMany
     {
         return $this->hasMany(Historico::class, 'processo_id');
     }

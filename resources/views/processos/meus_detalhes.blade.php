@@ -20,9 +20,9 @@
             <h5 class="mb-0">Histórico de Atualizações</h5>
         </div>
         <div class="card-body">
-            @if ($processo->historico->count() > 0)
+            @if ($processo->historicos->count() > 0)
                 <div class="timeline">
-                    @foreach ($processo->historico->sortBy('created_at') as $registro)
+                    @foreach ($processo->historicos->sortBy('created_at') as $registro)
                         <div class="timeline-item">
                             <div class="timeline-icon">
                                 <i class="bi bi-check-circle-fill"></i>

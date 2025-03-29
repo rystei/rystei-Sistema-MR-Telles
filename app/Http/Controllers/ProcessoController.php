@@ -105,15 +105,22 @@ class ProcessoController extends Controller
         }
     
 
-    public function destroy(Processo $processo)
-    {
-        try {
-            $processo->delete();
-            return redirect()->route('processos.index')->with('success', 'Processo excluído com sucesso!');
-        } catch (\Exception $e) {
-            return redirect()->route('processos.index')->with('error', 'Erro ao excluir processo: ' . $e->getMessage());
+        public function destroy(Processo $processo)
+        {
+            try {
+                // Exclui todos os históricos associados
+                $processo->historicos()->delete(); // Certifique-se que o relacionamento se chama "historico"
+
+                // Exclui o processo
+                $processo->delete();
+
+                return redirect()->route('processos.index')
+                    ->with('success', 'Processo excluído com sucesso!');
+            } catch (\Exception $e) {
+                return redirect()->route('processos.index')
+                    ->with('error', 'Erro ao excluir processo: ' . $e->getMessage());
+            }
         }
-    }
 
 
         public function meusProcessos(Request $request)
