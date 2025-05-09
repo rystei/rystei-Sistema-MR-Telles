@@ -44,22 +44,22 @@ O **MR Telles** é um sistema desenvolvido como projeto de estágio em Engenhari
 ---
 
 ## 📐 Modelagem e diagramas  
-- **Casos de Uso:** `docs/diagrams/use-case-diagram.png`  
-- **Diagrama de Classes:** `docs/diagrams/class-diagram.png`  
-- **DER (Entidade-Relacionamento):** `docs/diagrams/er-diagram.png`  
-- **Diagrama de Implantação:** `docs/diagrams/deployment-diagram.png`  
+- **Casos de Uso:** (https://drive.google.com/file/d/1fJRQKfvJV1F0zywzUJmpRe6xeypZTIiN/view?usp=drive_link)
+- **Diagrama de Classes:** (https://drive.google.com/file/d/1TvwMG3uhVTwXJDk_lEIbVB6M1f3E_m96/view?usp=sharing)
+- **DER (Entidade-Relacionamento):** (https://drive.google.com/file/d/1xy5V1LRPP-GTD2X9bM27JIYGuFXDHMW5/view?usp=sharing)`  
+- **Diagrama de Implantação:** (https://drive.google.com/file/d/19f5FLzFoxXgUqvSh_Sjsb75gheyhy6zA/view?usp=sharing)
 - **Diagrama de Sequência:**  
-  - Gerenciar Eventos: `docs/diagrams/seq-manage-events.png`  
-  - Marcar Consulta: `docs/diagrams/seq-schedule-consultation.png`  
-  - Gerenciar Pagamento: `docs/diagrams/seq-manage-payment.png`  
-  - Processar Pagamento: `docs/diagrams/seq-process-payment.png`  
-  - Acompanhar Processo: `docs/diagrams/seq-track-process.png`  
-  - Gerenciar Processo: `docs/diagrams/seq-manage-process.png`  
-  - Gerenciar Recursos Financeiros: `docs/diagrams/seq-manage-finance.png`  
-  - Acompanhar Recursos Financeiros: `docs/diagrams/seq-track-finance.png`  
+  - Gerenciar Eventos: (https://drive.google.com/file/d/1RcFLWaiU_-9YRoMu5vyfNuRcvZZTJn7e/view?usp=sharing)  
+  - Marcar Consulta: (https://drive.google.com/file/d/1-iJCuEiQp0gN8fLllVs_s4hmJOikSqRH/view?usp=sharing) 
+  - Gerenciar Pagamento: (https://drive.google.com/file/d/1BQfNU-FqOCFbsMW2H5OKJOyVUb7Y5woG/view?usp=sharing) 
+  - Processar Pagamento: (https://drive.google.com/file/d/10ytOeJIJi3HA1-CcHewqLndzlEBCFRL7/view?usp=sharing)
+  - Acompanhar Processo: (https://drive.google.com/file/d/1zpxpAP9xSUiykjnK7dm1hkgB2gW14AtB/view?usp=sharing) 
+  - Gerenciar Processo: (https://drive.google.com/file/d/1IbA4KYw8kC4zp3d3I6DVXTlgl8E2q2Zg/view?usp=sharing)
+  - Gerenciar Recursos Financeiros: (https://drive.google.com/file/d/126okwlEqqcFIzH1MuF2YpCqGJkhkcO3a/view?usp=sharing) 
+  - Acompanhar Recursos Financeiros: (https://drive.google.com/file/d/1F6XVSbTKLmz5OoNXcg7iuEFB_h3w-lmJ/view?usp=sharing) 
 - **Workflows BPMN:**  
-  - AS-IS: `docs/diagrams/bpmn-as-is.png`  
-  - TO-BE: `docs/diagrams/bpmn-to-be.png`
+  - AS-IS: (https://drive.google.com/file/d/1FvcHShtzcjopcV2KtSd4rhXCfEMNEfJO/view?usp=sharing) 
+  - TO-BE: (https://drive.google.com/file/d/1twS7ocAwfi7VRJ7mLAEO57WaM7pkNzkI/view?usp=sharing)
 
 ---
 
